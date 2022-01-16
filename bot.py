@@ -1,5 +1,6 @@
 import requests
 from PIL import Image, ImageFont, ImageDraw
+from datetime import date
 from datetime import datetime
 import os
 import time
@@ -7,22 +8,16 @@ import shutil
 import tweepy
 
 #===============#
+loadFont = 'BurbankBigRegular-BlackItalic.otf'
+showItems = False
+botDelay = 5
 
-loadFont = 'BurbankBigRegular-BlackItalic.otf' # The font used in the images
-creatorCode = 'Fevers' # Your Creator Code
-showItems = False # Prints whenever you generate an item into the console
-botDelay = 5 # The amount of seconds between how long the bot waits for a shop
+twitAPIKey = ''
+twitAPISecretKey = ''
+twitAccessToken = ''
+twitAccessTokenSecret = '' 
 
-# All Twitter API keys can be generated here: https://developer.twitter.com/
-twitAPIKey = '' # Your Twitter API Key.
-twitAPISecretKey = '' # Your Twitter API Secret Key.
-twitAccessToken = '' # Your Twitter Access Token Key.
-twitAccessTokenSecret = '' # Your Twitter Secret Access Token Key.
-
-updateMode = False # True = Waits until shop updates to post | False = Instantly posts shop to Twitter
-
-postshopInfo = True # Posts info on the shop with the tweet
-
+updateMode = False
 #===============#
 
 auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
@@ -39,7 +34,6 @@ def compress():
     print('Compressed image!')
 
 def genshop():
-    from datetime import date
 
     try:
         shutil.rmtree('cache')
@@ -314,74 +308,15 @@ def genshop():
 
     img=Image.open(f'shop.jpg')
     img.show()
-
-    if postshopInfo != True:
-        tweet_text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner'
-    else:
-        response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
-        s = response.json()['data']
-
-        list = []
-        today = date.today()
-        currentdate = today.strftime("%Y-%m-%d")
-
-        for i in s['featured']['entries']:
-            for i in i['items']:
-                shophistory = i['shopHistory']
-                try:
-                    lastseen = shophistory[-2]
-                except:
-                    lastseen = currentdate
-                lastseen = lastseen[:10]
-                dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-                current = datetime.strptime(currentdate, "%Y-%m-%d")
-                diff = current.date() - dateloop.date()
-                daysd=int(diff.days)
-                list.append(daysd)
-
-        for i in s['daily']['entries']:
-            for i in i['items']:
-                shophistory = i['shopHistory']
-                try:
-                    lastseen = shophistory[-2]
-                except:
-                    lastseen = currentdate
-                lastseen = lastseen[:10]
-                dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-                current = datetime.strptime(currentdate, "%Y-%m-%d")
-                diff = current.date() - dateloop.date()
-                daysd=int(diff.days)
-                list.append(daysd)
-
-        date = s['date']
-        date = date[:10]
-
-        featureditems = len(s['featured']['entries'])
-        dailyitems = len(s['daily']['entries'])
-        totalitems = featureditems+dailyitems
-
-        list.sort(reverse = True)
-        maxitem = list[0]
-
-        list.sort()
-        minitem = list[0]
-        
-        tweet_text = f'#Fortnite Item Shop update for {currentdate}!\n\nTotal Items: {totalitems}\nFeatured Items: {featureditems}\nDaily Items: {dailyitems}\nMax last seen: {maxitem} days\nMin last seen: {minitem} days'
-
-    try:
-        api.update_with_media(f'shop.jpg', tweet_text)
-    except:
-        print('FILE SIZE TOO BIG. COMPRESSING IMAGE.')
-        compress()
-        
-        print('')
-        print('Attempting to tweet...')
-        api.update_with_media(f'shop.jpg', tweet_text)
-        print('Tweeted!')
-
+    #try:
+    #    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
+    #except:
+    #    compress()
+    #    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
+    #time.sleep(10)
+    
 
 def main():
-    from datetime import date
     apiurl = f'https://fortnite-api.com/v2/shop/br/combined'
 
     response = requests.get(apiurl)
@@ -411,69 +346,15 @@ def main():
                 except:
                     os.makedirs('cache')
                 genshop()
-
-                if postshopInfo != True:
-                    tweet_text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner'
-                else:
-                    response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
-                    s = response.json()['data']
-
-                    list = []
-                    today = date.today()
-                    currentdate = today.strftime("%Y-%m-%d")
-
-                    for i in s['featured']['entries']:
-                        for i in i['items']:
-                            shophistory = i['shopHistory']
-                            try:
-                                lastseen = shophistory[-2]
-                            except:
-                                lastseen = currentdate
-                            lastseen = lastseen[:10]
-                            dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-                            current = datetime.strptime(currentdate, "%Y-%m-%d")
-                            diff = current.date() - dateloop.date()
-                            daysd=int(diff.days)
-                            list.append(daysd)
-
-                    for i in s['daily']['entries']:
-                        for i in i['items']:
-                            shophistory = i['shopHistory']
-                            try:
-                                lastseen = shophistory[-2]
-                            except:
-                                lastseen = currentdate
-                            lastseen = lastseen[:10]
-                            dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-                            current = datetime.strptime(currentdate, "%Y-%m-%d")
-                            diff = current.date() - dateloop.date()
-                            daysd=int(diff.days)
-                            list.append(daysd)
-
-                    date = s['date']
-                    date = date[:10]
-
-                    featureditems = len(s['featured']['entries'])
-                    dailyitems = len(s['daily']['entries'])
-                    totalitems = featureditems+dailyitems
-
-                    list.sort(reverse = True)
-                    maxitem = list[0]
-
-                    list.sort()
-                    minitem = list[0]
-                    
-                    tweet_text = f'#Fortnite Item Shop update for {currentdate}!\n\nTotal Items: {totalitems}\nFeatured Items: {featureditems}\nDaily Items: {dailyitems}\nMax last seen: {maxitem} days\nMin last seen: {minitem} days'
-
                 try:
-                    api.update_with_media(f'shop.jpg', tweet_text)
+                    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
                 except:
                     print('FILE SIZE TOO BIG. COMPRESSING IMAGE.')
                     compress()
                     
                     print('')
                     print('Attempting to tweet...')
-                    api.update_with_media(f'shop.jpg', tweet_text)
+                    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
                     print('Tweeted!')
 
                 print('')
