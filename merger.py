@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 import PIL
 import requests
 import glob
@@ -9,8 +9,10 @@ import os
 # Credits to https://github.com/MyNameIsDark01 for the original Merger code.
 # This merger is under rights, you may not take this code and use it in your own project without proper credits to Fevers and Dark.
 
-def merger(datas: Union[list, None] = None, save_as: str = f'shop.jpg'):
-    
+def merger(currentdate, datas: Union[list, None] = None, save_as: str = f'shop.jpg'):
+    if not datas:
+        datas = [Image.open(i) for i in glob.glob('cache/*.png')]
+
     list_ = []
     num = 0
     for file in os.listdir('cache'):
@@ -43,5 +45,22 @@ def merger(datas: Union[list, None] = None, save_as: str = f'shop.jpg'):
         i += 1
 
     image.save(f"{save_as}")
+
+    img = PIL.Image.open(f"{save_as}")
+    width, height = img.size
+
+    img=Image.new("RGB",(3072,height+322))
+
+    shopimage = Image.open(f"{save_as}")
+    img.paste(shopimage, (0, 322))
+    
+    font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',150)
+    draw=ImageDraw.Draw(img)
+    draw.text((1536,150),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
+
+    font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',50)
+    draw.text((1536,200),currentdate,font=font,fill='white', anchor='ms') # Writes name
+
+    img.save(f'{save_as}')
 
     return image
