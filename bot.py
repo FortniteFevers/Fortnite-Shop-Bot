@@ -300,7 +300,7 @@ def genshop():
 
     print('\nMerging images...')
     from merger import merger
-    merger()
+    merger(currentdate)
 
     end = time.time()
 
