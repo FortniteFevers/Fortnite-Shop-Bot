@@ -49,17 +49,17 @@ def merger(currentdate, datas: Union[list, None] = None, save_as: str = f'shop.j
     img = PIL.Image.open(f"{save_as}")
     width, height = img.size
 
-    img=Image.new("RGB",(3072,height+322))
+    img=Image.new("RGB",(width,height+322))
 
     shopimage = Image.open(f"{save_as}")
     img.paste(shopimage, (0, 322))
     
     font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',150)
     draw=ImageDraw.Draw(img)
-    draw.text((1536,150),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
+    draw.text((width/2,150),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
 
     font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',50)
-    draw.text((1536,200),currentdate,font=font,fill='white', anchor='ms') # Writes name
+    draw.text((width/2,200),currentdate,font=font,fill='white', anchor='ms') # Writes name
 
     img.save(f'{save_as}')
 
