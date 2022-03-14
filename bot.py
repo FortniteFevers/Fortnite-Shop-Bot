@@ -10,7 +10,7 @@ import tweepy
 #===============#
 loadFont = 'BurbankBigRegular-BlackItalic.otf'
 showItems = False
-botDelay = 5
+botDelay = 20
 
 twitAPIKey = ''
 twitAPISecretKey = ''
@@ -18,6 +18,10 @@ twitAccessToken = ''
 twitAccessTokenSecret = '' 
 
 updateMode = False
+
+showData = True
+
+CreatorCode = 'SAC'
 #===============#
 
 auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
@@ -57,7 +61,10 @@ def genshop():
     for i in featured['entries']:
 
         if i['newDisplayAssetPath'] != None:
-            url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+            try:
+                url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+            except:
+                url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
         else:
             url = i['items'][0]['images']['icon']
 
@@ -179,7 +186,10 @@ def genshop():
     for i in daily['entries']:
 
         if i['newDisplayAssetPath'] != None:
-            url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+            try:
+                url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+            except:
+                url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
         else:
             url = i['items'][0]['images']['icon']
 
@@ -308,12 +318,67 @@ def genshop():
 
     img=Image.open(f'shop.jpg')
     img.show()
-    #try:
-    #    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
-    #except:
-    #    compress()
-    #    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
-    #time.sleep(10)
+
+    s = response.json()['data']
+
+    list = []
+
+    for i in s['featured']['entries']:
+        for i in i['items']:
+            shophistory = i['shopHistory']
+            try:
+                lastseen = shophistory[-2]
+            except:
+                lastseen = currentdate
+            lastseen = lastseen[:10]
+            dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
+            current = datetime.strptime(currentdate, "%Y-%m-%d")
+            diff = current.date() - dateloop.date()
+            daysd=int(diff.days)
+            list.append(daysd)
+
+    for i in s['daily']['entries']:
+        for i in i['items']:
+            shophistory = i['shopHistory']
+            try:
+                lastseen = shophistory[-2]
+            except:
+                lastseen = currentdate
+            lastseen = lastseen[:10]
+            dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
+            current = datetime.strptime(currentdate, "%Y-%m-%d")
+            diff = current.date() - dateloop.date()
+            daysd=int(diff.days)
+            list.append(daysd)
+
+    featureditems = len(s['featured']['entries'])
+    dailyitems = len(s['daily']['entries'])
+    totalitems = featureditems+dailyitems
+
+    list.sort(reverse = True)
+    maxitem = list[0]
+
+    list.sort()
+    minitem = list[0]
+
+    average = sum(list) / len(list)
+    average = round(average, 0)
+
+    if showData == True:
+        text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner\n\nTotal Items: {totalitems}\nMax Last Seen: {maxitem} days\nMin Last Seen: {minitem} days\nAverage of Last Seen items: {average} days'
+    else:
+        text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner'
+
+    try:
+        api.update_with_media(f'shop.jpg', text)
+    except:
+        compress()
+        api.update_with_media(f'shop.jpg', text)
+
+    print('Tweeted!')
+
+    list.clear()
+    time.sleep(10)
     
 
 def main():
@@ -323,6 +388,7 @@ def main():
     shopData = response.json()['data']['hash']
     currentdate = response.json()['data']['date']
     currentdate = currentdate[:10]
+
 
     count = 1
 
@@ -338,6 +404,12 @@ def main():
             count = count + 1
             
             if shopData != shopDataLoop: # Now run program as normal. Shop has changed.
+
+                s = response.json()['data']
+                featureditems = len(s['featured']['entries'])
+                dailyitems = len(s['daily']['entries'])
+                totalitems = featureditems+dailyitems
+
                 print('\nTHE SHOP HAS UPDATED!')
                 time.sleep(10)
                 try:
@@ -346,18 +418,8 @@ def main():
                 except:
                     os.makedirs('cache')
                 genshop()
-                try:
-                    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
-                except:
-                    print('FILE SIZE TOO BIG. COMPRESSING IMAGE.')
-                    compress()
-                    
-                    print('')
-                    print('Attempting to tweet...')
-                    api.update_with_media(f'shop.jpg', f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "Fevers" to support me! #EpicPartner')
-                    print('Tweeted!')
 
-                print('')
+                time.sleep(5)
                 return main()
         
         else:
