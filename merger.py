@@ -6,6 +6,10 @@ from math import ceil, sqrt
 from typing import Union
 import os
 
+response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
+
+currentdate = response.json()['data']['date']
+currentdate = currentdate[:10]
 # Credits to https://github.com/MyNameIsDark01 for the original Merger code.
 # This merger is under rights, you may not take this code and use it in your own project without proper credits to Fevers and Dark.
 
@@ -17,7 +21,11 @@ def merger(currentdate, datas: Union[list, None] = None, save_as: str = f'shop.j
     num = 0
     for file in os.listdir('cache'):
         num += 1
-        list_.append(f'cache/{file}')
+        
+        if file.startswith('tempzzz'):
+            pass
+        else:
+            list_.append(f'cache/{file}')
 
     row_n = num
         
@@ -56,11 +64,12 @@ def merger(currentdate, datas: Union[list, None] = None, save_as: str = f'shop.j
     
     font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',150)
     draw=ImageDraw.Draw(img)
-    draw.text((width/2,150),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
+    draw.text((width/2,180),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
 
     font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',50)
-    draw.text((width/2,200),currentdate,font=font,fill='white', anchor='ms') # Writes name
+    draw.text((width/2,230),currentdate,font=font,fill='white', anchor='ms') # Writes name
 
     img.save(f'{save_as}')
+    img.save(f'past_shops/{currentdate}.jpg')
 
     return image
