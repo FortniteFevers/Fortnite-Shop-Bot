@@ -17,7 +17,7 @@ twitAPISecretKey = ''
 twitAccessToken = ''
 twitAccessTokenSecret = '' 
 
-updateMode = False
+updateMode = True
 
 showData = True
 
@@ -48,8 +48,15 @@ def genshop():
     start = time.time()
 
     response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
+    if response:
+        pass
+    else:
+        return genshop()
 
-    data = response.json()['data']
+    try:
+        data = response.json()['data']
+    except:
+        return genshop()
 
     currentdate = response.json()['data']['date']
     currentdate = currentdate[:10]
@@ -62,9 +69,15 @@ def genshop():
 
         if i['newDisplayAssetPath'] != None:
             try:
-                url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                try:
+                    url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                except:
+                    url = i['items'][0]['images']['icon']
             except:
-                url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
+                try:
+                    url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
+                except:
+                    url = i['items'][0]['images']['icon']
         else:
             url = i['items'][0]['images']['icon']
 
