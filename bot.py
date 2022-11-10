@@ -22,11 +22,14 @@ updateMode = True
 showData = True
 
 CreatorCode = 'SAC'
+
+TweetShop = True
 #===============#
 
-auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
-auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
-api = tweepy.API(auth)
+if TweetShop != False:
+    auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
+    auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
+    api = tweepy.API(auth)
 
 def compress():
     import math
@@ -381,14 +384,17 @@ def genshop():
         text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner\n\nTotal Items: {totalitems}\nMax Last Seen: {maxitem} days\nMin Last Seen: {minitem} days\nAverage of Last Seen items: {average} days'
     else:
         text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner'
+    
+    if TweetShop != False:
+        try:
+            api.update_with_media(f'shop.jpg', text)
+        except:
+            compress()
+            api.update_with_media(f'shop.jpg', text)
 
-    try:
-        api.update_with_media(f'shop.jpg', text)
-    except:
-        compress()
-        api.update_with_media(f'shop.jpg', text)
-
-    print('Tweeted!')
+        print('Tweeted!')
+    else:
+        print('Saved image!')
 
     list.clear()
     time.sleep(10)
