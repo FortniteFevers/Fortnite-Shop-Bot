@@ -9,27 +9,27 @@ import tweepy
 
 #===============#
 loadFont = 'BurbankBigRegular-BlackItalic.otf'
-showItems = False
-botDelay = 20
+showItems = False # Doesn't do anything. Just prints the items in the console while genrating.
+botDelay = 15 # Time for the bot to check when the shop updates
 
-twitAPIKey = ''
+# These are keys provided by the Twitter API. (API LINK: https://developer.twitter.com/en/portal/dashboard)
+twitAPIKey = '' 
 twitAPISecretKey = ''
 twitAccessToken = ''
 twitAccessTokenSecret = '' 
 
-updateMode = True
+updateMode = True # If true, the system keeps refreshing until shop updates. If false, the system instnatly runs the shop generation.
 
-showData = True
+showData = True # Shows shop data in your tweet, I reccomend to keep this on
 
-CreatorCode = 'SAC'
+CreatorCode = '' # Adds a creator code to your caption
 
-TweetShop = True
+OGitemsbot = True # Posts a seperate tweet after the Item Shop showcasing if there are any rare items that have returned to the shop
 #===============#
 
-if TweetShop != False:
-    auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
-    auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
-    api = tweepy.API(auth)
+auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
+auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
+api = tweepy.API(auth)
 
 def compress():
     import math
@@ -203,7 +203,10 @@ def genshop():
 
         if i['newDisplayAssetPath'] != None:
             try:
-                url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                try:
+                    url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                except:
+                    pass
             except:
                 url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
         else:
@@ -384,21 +387,114 @@ def genshop():
         text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner\n\nTotal Items: {totalitems}\nMax Last Seen: {maxitem} days\nMin Last Seen: {minitem} days\nAverage of Last Seen items: {average} days'
     else:
         text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner'
-    
-    if TweetShop != False:
-        try:
-            api.update_with_media(f'shop.jpg', text)
-        except:
-            compress()
-            api.update_with_media(f'shop.jpg', text)
 
-        print('Tweeted!')
-    else:
-        print('Saved image!')
+    try:
+        api.update_with_media(f'shop.jpg', text)
+    except:
+        compress()
+        api.update_with_media(f'shop.jpg', text)
+
+    print('Tweeted!')
 
     list.clear()
     time.sleep(10)
     
+def ogitems():
+    ######################
+    opitemdate = 150
+    ######################
+
+    today = date.today()
+    currentdate = today.strftime("%Y-%m-%d")
+    response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
+    featured = response.json()['data']['featured']
+    daily = response.json()['data']['daily']
+
+    resultlist = []
+    numberlist = []
+
+    for i in featured['entries']:
+        for i in i['items']:
+            id = i['id']
+            name = i['name']
+            type = i['type']['displayValue']
+            shophistory = i['shopHistory']
+            try:
+                lastseen = shophistory[-2]
+            except:
+                lastseen = currentdate
+            lastseen = lastseen[:10]
+            dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
+            current = datetime.strptime(currentdate, "%Y-%m-%d")
+            diff = current.date() - dateloop.date()
+            daysd=int(diff.days)
+            if daysd >= opitemdate:
+            
+                resultlist.append(
+                    {
+                        "name": name,
+                        "id": id,
+                        "lastseen_days": f"{diff.days}",
+                        "lastseen_date": lastseen,
+                        "type": type
+                    }
+                )
+
+                numberlist.append(diff.days)
+
+    for i in daily['entries']:
+        for i in i['items']:
+            id = i['id']
+            name = i['name']
+            type = i['type']['displayValue']
+            shophistory = i['shopHistory']
+            try:
+                lastseen = shophistory[-2]
+            except:
+                lastseen = currentdate
+            lastseen = lastseen[:10]
+            dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
+            current = datetime.strptime(currentdate, "%Y-%m-%d")
+            diff = current.date() - dateloop.date()
+            daysd=int(diff.days)
+            if daysd >= opitemdate:
+            
+                resultlist.append(
+                    {
+                        "name": name,
+                        "id": id,
+                        "lastseen_days": f"{diff.days}",
+                        "lastseen_date": lastseen,
+                        "type": type
+                    }
+                )
+
+                numberlist.append(diff.days)
+    print(numberlist)
+    if numberlist == []:
+        print('There are no rare items tonight.')
+        api.update_status(f"There are no rare items that have returned in the #Fortnite Item Shop of {currentdate}.")
+        pass
+    else:
+        print('There are rare items tonight!')
+        numberlist.sort()
+        biggestnum = numberlist[-1]
+
+        rarestitem = ''
+        for i in resultlist:
+            if i['lastseen_days'] == f'{biggestnum}':
+                rarestitem += f"The rarest item is the {i['name']} {i['type']}, which hasn't been seen in {i['lastseen_days']} days!"
+
+        tweetstring = "Rare items that have returned in tonight's #Fortnite Item Shop:\n\n"
+        for i in resultlist:
+            tweetstring += f"- {i['name']} ({i['lastseen_days']} days)\n"
+
+        resultweet = f"{tweetstring}\n\n{rarestitem}"
+
+        try:
+            api.update_status(resultweet)
+        except:
+            api.update_status('There are rare items in the #Fortnite Item Shop tonight..\n\nHowever I am not able to post it as the tweet is too long. This means there are lots of rare cosmetics in the shop!')
 
 def main():
     apiurl = f'https://fortnite-api.com/v2/shop/br/combined'
@@ -437,6 +533,9 @@ def main():
                 except:
                     os.makedirs('cache')
                 genshop()
+
+                if OGitemsbot is True:
+                    ogitems()
 
                 time.sleep(5)
                 return main()
