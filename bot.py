@@ -25,6 +25,7 @@ showData = True # Shows shop data in your tweet, I reccomend to keep this on
 CreatorCode = '' # Adds a creator code to your caption
 
 OGitemsbot = True # Posts a seperate tweet after the Item Shop showcasing if there are any rare items that have returned to the shop
+opitemdate = 150 # If items are over .... days, classify as a "rare" cosmetic
 #===============#
 
 auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
@@ -401,7 +402,7 @@ def genshop():
     
 def ogitems():
     ######################
-    opitemdate = 150
+    #opitemdate = 150
     ######################
 
     today = date.today()
