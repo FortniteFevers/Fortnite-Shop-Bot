@@ -116,40 +116,41 @@ def genshop():
         img.paste(background)
 
         # OTHER ITEMS GEN
-        try:
-            if i['items'][1]:
-                url = i['items'][1]['images']['icon']
-                open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                background.save(f'cache/temp{name}.png')
-            
-                background = Image.open(f'cache/temp{name}.png')
-                img.paste(background, (0, 0), background)
+        if i['bundle'] == None:
+            try:
+                if i['items'][1]:
+                    url = i['items'][1]['images']['icon']
+                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                    background.save(f'cache/temp{name}.png')
 
-                os.remove(f'cache/temp{name}.png')
-            if i['items'][2]:
-                url = i['items'][2]['images']['icon']
-                open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                background.save(f'cache/temp{name}.png')
-            
-                background = Image.open(f'cache/temp{name}.png')
-                img.paste(background, (0, 100), background)
+                    background = Image.open(f'cache/temp{name}.png')
+                    img.paste(background, (0, 0), background)
 
-                os.remove(f'cache/temp{name}.png')
+                    os.remove(f'cache/temp{name}.png')
+                if i['items'][2]:
+                    url = i['items'][2]['images']['icon']
+                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                    background.save(f'cache/temp{name}.png')
 
-            if i['items'][3]:
-                url = i['items'][3]['images']['icon']
-                open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                background.save(f'cache/temp{name}.png')
-            
-                background = Image.open(f'cache/temp{name}.png')
-                img.paste(background, (0, 200), background)
+                    background = Image.open(f'cache/temp{name}.png')
+                    img.paste(background, (0, 100), background)
 
-                os.remove(f'cache/temp{name}.png')
-        except:
-            pass
+                    os.remove(f'cache/temp{name}.png')
+
+                if i['items'][3]:
+                    url = i['items'][3]['images']['icon']
+                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                    background.save(f'cache/temp{name}.png')
+
+                    background = Image.open(f'cache/temp{name}.png')
+                    img.paste(background, (0, 200), background)
+
+                    os.remove(f'cache/temp{name}.png')
+            except:
+                pass
 
 
 
@@ -245,40 +246,41 @@ def genshop():
         img.paste(background)
 
         # OTHER ITEMS GEN
-        try:
-            if i['items'][1]:
-                url = i['items'][1]['images']['icon']
-                open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                background.save(f'cache/temp{name}.png')
-            
-                background = Image.open(f'cache/temp{name}.png')
-                img.paste(background, (0, 0), background)
+        if i['bundle'] == None:
+            try:
+                if i['items'][1]:
+                    url = i['items'][1]['images']['icon']
+                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                    background.save(f'cache/temp{name}.png')
 
-                os.remove(f'cache/temp{name}.png')
-            if i['items'][2]:
-                url = i['items'][2]['images']['icon']
-                open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                background.save(f'cache/temp{name}.png')
-            
-                background = Image.open(f'cache/temp{name}.png')
-                img.paste(background, (0, 100), background)
+                    background = Image.open(f'cache/temp{name}.png')
+                    img.paste(background, (0, 0), background)
 
-                os.remove(f'cache/temp{name}.png')
+                    os.remove(f'cache/temp{name}.png')
+                if i['items'][2]:
+                    url = i['items'][2]['images']['icon']
+                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                    background.save(f'cache/temp{name}.png')
 
-            if i['items'][3]:
-                url = i['items'][3]['images']['icon']
-                open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                background.save(f'cache/temp{name}.png')
-            
-                background = Image.open(f'cache/temp{name}.png')
-                img.paste(background, (0, 200), background)
+                    background = Image.open(f'cache/temp{name}.png')
+                    img.paste(background, (0, 100), background)
 
-                os.remove(f'cache/temp{name}.png')
-        except:
-            pass
+                    os.remove(f'cache/temp{name}.png')
+
+                if i['items'][3]:
+                    url = i['items'][3]['images']['icon']
+                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                    background.save(f'cache/temp{name}.png')
+
+                    background = Image.open(f'cache/temp{name}.png')
+                    img.paste(background, (0, 200), background)
+
+                    os.remove(f'cache/temp{name}.png')
+            except:
+                pass
 
         overlay = Image.open('overlay.png').convert('RGBA')
         img.paste(overlay, (0,0), overlay)
