@@ -201,126 +201,128 @@ def genshop():
     print('Generating Daily Section...')
     daily = data['daily']
     count = 0
-    for i in daily['entries']:
-
-        if i['newDisplayAssetPath'] != None:
-            try:
+    if daily != None:
+        for i in daily['entries']:
+    
+            if i['newDisplayAssetPath'] != None:
                 try:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                    try:
+                        url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                    except:
+                        pass
+                except:
+                    url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
+            else:
+                url = i['items'][0]['images']['icon']
+    
+    
+            name = i['items'][0]['id']
+            last_seen = i['items'][0]['shopHistory']
+            try:
+                last_seen = last_seen[-2][:10]
+            except:
+                last_seen = 'NEW!'
+            price = i['finalPrice']
+    
+            if i['bundle'] != None:
+                url = i['bundle']['image']
+                name = f"zzz{i['bundle']['name']}"
+            
+            if last_seen != 'NEW!':
+                dateloop = datetime.strptime(last_seen, "%Y-%m-%d")
+                current = datetime.strptime(currentdate, "%Y-%m-%d")
+                diff = str(current.date() - dateloop.date())
+                diff = diff.replace('days, 0:00:00', '')
+                if diff == '0:00:00':
+                    diff = '1'
+            else:
+                diff = 'NEW!'
+    
+    
+            open(f'cache/{name}.png', 'wb').write(requests.get(url).content)
+            background = Image.open(f'cache/{name}.png').resize((512, 512), Image.ANTIALIAS)
+            background.save(f'cache/{name}.png')
+    
+            img=Image.new("RGB",(512,512))
+            img.paste(background)
+    
+            # OTHER ITEMS GEN
+            if i['bundle'] == None:
+                try:
+                    if i['items'][1]:
+                        url = i['items'][1]['images']['icon']
+                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                        background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                        background.save(f'cache/temp{name}.png')
+    
+                        background = Image.open(f'cache/temp{name}.png')
+                        img.paste(background, (0, 0), background)
+    
+                        os.remove(f'cache/temp{name}.png')
+                    if i['items'][2]:
+                        url = i['items'][2]['images']['icon']
+                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                        background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                        background.save(f'cache/temp{name}.png')
+    
+                        background = Image.open(f'cache/temp{name}.png')
+                        img.paste(background, (0, 100), background)
+    
+                        os.remove(f'cache/temp{name}.png')
+    
+                    if i['items'][3]:
+                        url = i['items'][3]['images']['icon']
+                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
+                        background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
+                        background.save(f'cache/temp{name}.png')
+    
+                        background = Image.open(f'cache/temp{name}.png')
+                        img.paste(background, (0, 200), background)
+    
+                        os.remove(f'cache/temp{name}.png')
                 except:
                     pass
-            except:
-                url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
-        else:
-            url = i['items'][0]['images']['icon']
-
-
-        name = i['items'][0]['id']
-        last_seen = i['items'][0]['shopHistory']
-        try:
-            last_seen = last_seen[-2][:10]
-        except:
-            last_seen = 'NEW!'
-        price = i['finalPrice']
-
-        if i['bundle'] != None:
-            url = i['bundle']['image']
-            name = f"zzz{i['bundle']['name']}"
-        
-        if last_seen != 'NEW!':
-            dateloop = datetime.strptime(last_seen, "%Y-%m-%d")
-            current = datetime.strptime(currentdate, "%Y-%m-%d")
-            diff = str(current.date() - dateloop.date())
-            diff = diff.replace('days, 0:00:00', '')
-            if diff == '0:00:00':
-                diff = '1'
-        else:
-            diff = 'NEW!'
-
-
-        open(f'cache/{name}.png', 'wb').write(requests.get(url).content)
-        background = Image.open(f'cache/{name}.png').resize((512, 512), Image.ANTIALIAS)
-        background.save(f'cache/{name}.png')
-
-        img=Image.new("RGB",(512,512))
-        img.paste(background)
-
-        # OTHER ITEMS GEN
-        if i['bundle'] == None:
-            try:
-                if i['items'][1]:
-                    url = i['items'][1]['images']['icon']
-                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                    background.save(f'cache/temp{name}.png')
-
-                    background = Image.open(f'cache/temp{name}.png')
-                    img.paste(background, (0, 0), background)
-
-                    os.remove(f'cache/temp{name}.png')
-                if i['items'][2]:
-                    url = i['items'][2]['images']['icon']
-                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                    background.save(f'cache/temp{name}.png')
-
-                    background = Image.open(f'cache/temp{name}.png')
-                    img.paste(background, (0, 100), background)
-
-                    os.remove(f'cache/temp{name}.png')
-
-                if i['items'][3]:
-                    url = i['items'][3]['images']['icon']
-                    open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                    background = Image.open(f'cache/temp{name}.png').resize((80, 80), Image.ANTIALIAS)
-                    background.save(f'cache/temp{name}.png')
-
-                    background = Image.open(f'cache/temp{name}.png')
-                    img.paste(background, (0, 200), background)
-
-                    os.remove(f'cache/temp{name}.png')
-            except:
-                pass
-
-        overlay = Image.open('overlay.png').convert('RGBA')
-        img.paste(overlay, (0,0), overlay)
-
-        img.save(f'cache/{name}.png')
-
-        background = Image.open(f'cache/{name}.png')
-
-
-        itemname = i['items'][0]['name']
-        if i['bundle'] != None:
-            itemname = f"{i['bundle']['name']}"
-        font=ImageFont.truetype(loadFont,35)
-        draw=ImageDraw.Draw(background)
-        draw.text((256,420),itemname,font=font,fill='white', anchor='ms') # Writes name
-
-        if 'NEW!' in diff:
-            diff_text = 'NEW!'
-        else:
-            diff = diff.replace(' ', '')
-            diff_text = f'LAST SEEN: {diff} days ago'
-
-        if '0:00' in diff_text:
-            diff_text = 'LAST SEEN: 1 day ago'
-
-        font=ImageFont.truetype(loadFont,15)
-        draw=ImageDraw.Draw(background)
-        draw.text((256,450),diff_text,font=font,fill='white', anchor='ms') # Writes date last seen
-
-        font=ImageFont.truetype(loadFont,40)
-        draw=ImageDraw.Draw(background)
-        draw.text((256,505),f'{price}',font=font,fill='white', anchor='ms') # Writes price
-
-        background.save(f'cache/{name}.png')
-
-        if showItems != False:
-            print(f'Last Seen: {diff} days ago\n{name} - {price}\n')
-
-        count += 1
-
+    
+            overlay = Image.open('overlay.png').convert('RGBA')
+            img.paste(overlay, (0,0), overlay)
+    
+            img.save(f'cache/{name}.png')
+    
+            background = Image.open(f'cache/{name}.png')
+    
+    
+            itemname = i['items'][0]['name']
+            if i['bundle'] != None:
+                itemname = f"{i['bundle']['name']}"
+            font=ImageFont.truetype(loadFont,35)
+            draw=ImageDraw.Draw(background)
+            draw.text((256,420),itemname,font=font,fill='white', anchor='ms') # Writes name
+    
+            if 'NEW!' in diff:
+                diff_text = 'NEW!'
+            else:
+                diff = diff.replace(' ', '')
+                diff_text = f'LAST SEEN: {diff} days ago'
+    
+            if '0:00' in diff_text:
+                diff_text = 'LAST SEEN: 1 day ago'
+    
+            font=ImageFont.truetype(loadFont,15)
+            draw=ImageDraw.Draw(background)
+            draw.text((256,450),diff_text,font=font,fill='white', anchor='ms') # Writes date last seen
+    
+            font=ImageFont.truetype(loadFont,40)
+            draw=ImageDraw.Draw(background)
+            draw.text((256,505),f'{price}',font=font,fill='white', anchor='ms') # Writes price
+    
+            background.save(f'cache/{name}.png')
+    
+            if showItems != False:
+                print(f'Last Seen: {diff} days ago\n{name} - {price}\n')
+    
+            count += 1
+    else:
+        print("Daily section does not exist.)
 
     print(f'Done generating "{count}" items in the Daily section.')
     daily_num = count
