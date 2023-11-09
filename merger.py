@@ -64,10 +64,10 @@ def merger(currentdate, datas: Union[list, None] = None, save_as: str = f'shop.j
     
     font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',150)
     draw=ImageDraw.Draw(img)
-    draw.text((width/2,180),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
+    draw.text((width/2,190),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
 
     font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',50)
-    draw.text((width/2,230),currentdate,font=font,fill='white', anchor='ms') # Writes name
+    draw.text((width/2,240),currentdate,font=font,fill='white', anchor='ms') # Writes name
 
     img.save(f'{save_as}')
     img.save(f'past_shops/{currentdate}.jpg')
