@@ -1,5 +1,5 @@
 # Fortnite-Shop-Bot
-A bot to automatically post the Fortnite Item Shop to a twitter.
+A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets belong to Epic Games.
 
 --------------
 
