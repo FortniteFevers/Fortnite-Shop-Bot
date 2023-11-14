@@ -322,7 +322,7 @@ def genshop():
     
             count += 1
     else:
-        print("Daily section does not exist.)
+        print("Daily section does not exist.")
 
     print(f'Done generating "{count}" items in the Daily section.')
     daily_num = count
