@@ -1,25 +1,3 @@
-#===============#
-loadFont = 'BurbankBigRegular-BlackItalic.otf'
-showItems = False
-botDelay = 15
-
-ToggleTweet = True # True means the program uses your Twitter API keys. False means it does not.
-twitAPIKey = ""
-twitAPISecretKey = ""
-twitAccessToken = ""
-twitAccessTokenSecret = ""
-
-# CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
-updateMode = True # False means it instantly tweets it, true means it keeps refreshing until shop updates
-
-showData = True
-
-CreatorCode = 'Fevers'
-
-OGitemsbot = True
-opitemdate = 100
-#===============#
-
 import requests
 from PIL import Image, ImageFont, ImageDraw
 from datetime import date
@@ -29,7 +7,30 @@ import time
 import shutil
 import tweepy
 
+#===============#
+loadFont = 'BurbankBigRegular-BlackItalic.otf'
+showItems = False
+botDelay = 15
+
+ToggleTweet = True # True means the program uses your Twitter API keys. False means it does not.
+twitAPIKey = ''
+twitAPISecretKey = ''
+twitAccessToken = ''
+twitAccessTokenSecret = '' 
+
+# CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
+updateMode = False # False means it instantly tweets it, true means it keeps refreshing until shop updates
+
+showData = True
+
+CreatorCode = 'Fevers'
+
+OGitemsbot = True
+opitemdate = 180
+#===============#
+
 if ToggleTweet == True:
+    print("\n! ! ! TWEETING IS ON ! ! !\n")
     # V1 Tweepy
     auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
     auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
@@ -339,7 +340,7 @@ def genshop():
 
     print('\nMerging images...')
     from merger import merger
-    merger(currentdate)
+    merger(ogitems=False)
 
     end = time.time()
 
@@ -406,27 +407,30 @@ def genshop():
         try:
             try:
                 media_id = api.media_upload(filename="shop.jpg").media_id
-                client.create_tweet(text=text, media_ids=[media_id])
+                shoptweet = client.create_tweet(text=text, media_ids=[media_id])
             except Exception as e:
                 print(e)
         except:
             compress()
             try:
                 media_id = api.media_upload(filename="shop.jpg").media_id
-                client.create_tweet(text=text, media_ids=[media_id])
+                shoptweet = client.create_tweet(text=text, media_ids=[media_id])
             except Exception as e:
                 print(e)
 
         print('Tweeted!')
+        print(f"Tweet ID: {shoptweet.data['id']}")
 
     list.clear()
+    ogitems(tweetID=shoptweet.data['id'])
     time.sleep(10)
     
-def ogitems():
-    ######################
-    #opitemdate = 150
-    ######################
-
+def ogitems(tweetID):
+    try:
+        shutil.rmtree('ogcache')
+        os.makedirs('ogcache')
+    except:
+        os.makedirs('ogcache')
     today = date.today()
     currentdate = today.strftime("%Y-%m-%d")
     response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
@@ -493,14 +497,15 @@ def ogitems():
                     )
 
                     numberlist.append(diff.days)
-    print(numberlist)
+    #print(numberlist) ([364, 364, 145, 132, 159, 298, 161])
+    print('')
     if numberlist == []:
         print('There are no rare items tonight.')
         if ToggleTweet == True:
-            client.create_tweet(text=f"There are no rare items that have returned in the #Fortnite Item Shop of {currentdate}.")
+            client.create_tweet(text=f"There are no rare items (items that haven't been in the shop for {opitemdate} days) that have returned in the #Fortnite Item Shop of {currentdate}.", in_reply_to_tweet_id=tweetID)
         pass
     else:
-        print('There are rare items tonight!')
+        print('Rare cosmetics have been detected!')
         numberlist.sort()
         biggestnum = numberlist[-1]
 
@@ -516,19 +521,21 @@ def ogitems():
         resultweet = f"{tweetstring}\n\n{rarestitem}"
         print(resultweet)
 
-        try:
-            if ToggleTweet == True:
-                client.create_tweet(text=resultweet)
-            else:
-                pass
-        except:
-            if ToggleTweet == True:
-                client.create_tweet(text='There are rare items in the #Fortnite Item Shop tonight..\n\nHowever I am not able to post it as the tweet is too long. This means there are lots of rare cosmetics in the shop!')
-            else:
-                pass
-            
-        for i in os.listdir('cache'):
-            print(i)
+        for filename in os.listdir('cache'):
+            for item in resultlist:
+                if f"{item['id']}.png" == filename:
+                    shutil.copy(f"cache/{filename}", f"ogcache/OG{filename}.png")
+        from merger import merger
+        merger(ogitems=True)
+
+        #   media_id = api.media_upload(filename="shop.jpg").media_id
+        #   shoptweet = client.create_tweet(text=text, media_ids=[media_id])
+        if ToggleTweet == True:
+            media_id = api.media_upload(filename="OGitems.jpg").media_id
+            client.create_tweet(text=f"There are {len(numberlist)} cosmetics that haven't been seen in {opitemdate} days!\n\n#Fortnite", media_ids=[media_id], in_reply_to_tweet_id=tweetID)
+        else:
+            pass
+
 
 def main():
     apiurl = f'https://fortnite-api.com/v2/shop/br/combined'
