@@ -1,5 +1,6 @@
 # Fortnite-Shop-Bot
 A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets belong to Epic Games.
+(If you do not want to use the Twitter / X capabilities of the program, change "ToggleTweet" to "False" in bot.py
 
 --------------
 
