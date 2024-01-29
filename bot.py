@@ -422,7 +422,8 @@ def genshop():
         print(f"Tweet ID: {shoptweet.data['id']}")
 
     list.clear()
-    ogitems(tweetID=shoptweet.data['id'])
+    if OGitemsbot is True:
+        ogitems(tweetID=shoptweet.data['id'])
     time.sleep(10)
     
 def ogitems(tweetID):
@@ -533,6 +534,7 @@ def ogitems(tweetID):
         if ToggleTweet == True:
             media_id = api.media_upload(filename="OGitems.jpg").media_id
             client.create_tweet(text=f"There are {len(numberlist)} cosmetics that haven't been seen in {opitemdate} days!\n\n#Fortnite", media_ids=[media_id], in_reply_to_tweet_id=tweetID)
+            print("Replied to original tweet with OG Item Bot.")
         else:
             pass
 
@@ -574,9 +576,6 @@ def main():
                 except:
                     os.makedirs('cache')
                 genshop()
-
-                if OGitemsbot is True:
-                    ogitems()
 
                 time.sleep(5)
                 return main()
