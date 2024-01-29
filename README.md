@@ -22,4 +22,4 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 --------------
 
 # Example Image:
-![This is an image]([https://pbs.twimg.com/media/GE-gTvBXUAAJnuJ?format=jpg&name=4096x4096)
+![Item Shop](https://pbs.twimg.com/media/GE-gTvBXUAAJnuJ?format=jpg&name=4096x4096)
