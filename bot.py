@@ -1,12 +1,3 @@
-import requests
-from PIL import Image, ImageFont, ImageDraw
-from datetime import date
-from datetime import datetime
-import os
-import time
-import shutil
-import tweepy
-
 #===============#
 loadFont = 'BurbankBigRegular-BlackItalic.otf'
 showItems = False
@@ -28,6 +19,15 @@ CreatorCode = 'Fevers'
 OGitemsbot = True
 opitemdate = 100
 #===============#
+
+import requests
+from PIL import Image, ImageFont, ImageDraw
+from datetime import date
+from datetime import datetime
+import os
+import time
+import shutil
+import tweepy
 
 if ToggleTweet == True:
     # V1 Tweepy
