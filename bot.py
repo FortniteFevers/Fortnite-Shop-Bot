@@ -12,15 +12,14 @@ loadFont = 'BurbankBigRegular-BlackItalic.otf'
 showItems = False
 botDelay = 15
 
-# BEFORE ENTERING YOUR KEYS, MAKE SURE YOUR CLIENT HAS "Read and write and Direct message" AND RESET YOUR TOKENS AFTER DOING SO
-twitAPIKey = '' # Replace with your X API key
-twitAPISecretKey = '' # Replace with your X API Secret key
-twitAccessToken = '' # Replace with your X Access key
-twitAccessTokenSecret = '' # Replace with your X Access Secret key
+twitAPIKey = ""
+twitAPISecretKey = ""
+twitAccessToken = ""
+twitAccessTokenSecret = ""
 
 updateMode = True # False means it instantly tweets it, true means it keeps refreshing until shop updates
 
-showData = True # Posts tweet with 
+showData = True
 
 CreatorCode = 'Fevers'
 
@@ -407,8 +406,11 @@ def genshop():
             print(e)
     except:
         compress()
-        media = api.media_upload("shop.jpg")
-        api.update_status(status=text, media_ids=[media.media_id])
+        try:
+            media_id = api.media_upload(filename="shop.jpg").media_id
+            client.create_tweet(text=text, media_ids=[media_id])
+        except Exception as e:
+            print(e)
 
     print('Tweeted!')
 
