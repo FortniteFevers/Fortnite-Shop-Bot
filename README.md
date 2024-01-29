@@ -20,6 +20,11 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 *  Change Type of App from *"Native App"* to **"Web App, Automated App or Bot"**
 *  Under App info, change your "Callback URI / Redirect URL" to "https://localhost"
 *  Under App info, change your "Website URL" to "https://localhost.com"
+
+# OG Item Bot - How to use
+* *(Only works when the program is in updateMode)*
+* Toggle **OGitemsbot** to True
+* The "OG/Rare" item threshold is set by **opitemdate**. Change the value to set your threshold for cosmetics.
 --------------
 
 # Modules:
