@@ -12,11 +12,13 @@ loadFont = 'BurbankBigRegular-BlackItalic.otf'
 showItems = False
 botDelay = 15
 
+ToggleTweet = True # True means the program uses your Twitter API keys. False means it does not.
 twitAPIKey = ""
 twitAPISecretKey = ""
 twitAccessToken = ""
 twitAccessTokenSecret = ""
 
+# CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
 updateMode = True # False means it instantly tweets it, true means it keeps refreshing until shop updates
 
 showData = True
@@ -27,20 +29,21 @@ OGitemsbot = True
 opitemdate = 100
 #===============#
 
-# V1 Tweepy
-auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
-auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
-api = tweepy.API(auth, wait_on_rate_limit=True)
+if ToggleTweet == True:
+    # V1 Tweepy
+    auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
+    auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
+    api = tweepy.API(auth, wait_on_rate_limit=True)
 
 
-# V2 Tweepy
-client = tweepy.Client(
-    access_token=twitAccessToken,
-    access_token_secret=twitAccessTokenSecret,
-    consumer_key=twitAPIKey,
-    consumer_secret=twitAPISecretKey,
-    wait_on_rate_limit=True
-    )
+    # V2 Tweepy
+    client = tweepy.Client(
+        access_token=twitAccessToken,
+        access_token_secret=twitAccessTokenSecret,
+        consumer_key=twitAPIKey,
+        consumer_secret=twitAPISecretKey,
+        wait_on_rate_limit=True
+        )
 
 def compress():
     import math
@@ -398,21 +401,23 @@ def genshop():
     else:
         text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner'
     print(text)
-    try:
+    
+    if ToggleTweet == True:
         try:
-            media_id = api.media_upload(filename="shop.jpg").media_id
-            client.create_tweet(text=text, media_ids=[media_id])
-        except Exception as e:
-            print(e)
-    except:
-        compress()
-        try:
-            media_id = api.media_upload(filename="shop.jpg").media_id
-            client.create_tweet(text=text, media_ids=[media_id])
-        except Exception as e:
-            print(e)
+            try:
+                media_id = api.media_upload(filename="shop.jpg").media_id
+                client.create_tweet(text=text, media_ids=[media_id])
+            except Exception as e:
+                print(e)
+        except:
+            compress()
+            try:
+                media_id = api.media_upload(filename="shop.jpg").media_id
+                client.create_tweet(text=text, media_ids=[media_id])
+            except Exception as e:
+                print(e)
 
-    print('Tweeted!')
+        print('Tweeted!')
 
     list.clear()
     time.sleep(10)
@@ -491,7 +496,8 @@ def ogitems():
     print(numberlist)
     if numberlist == []:
         print('There are no rare items tonight.')
-        api.update_status(f"There are no rare items that have returned in the #Fortnite Item Shop of {currentdate}.")
+        if ToggleTweet == True:
+            client.create_tweet(text=f"There are no rare items that have returned in the #Fortnite Item Shop of {currentdate}.")
         pass
     else:
         print('There are rare items tonight!')
@@ -511,10 +517,16 @@ def ogitems():
         print(resultweet)
 
         try:
-            api.update_status(resultweet)
+            if ToggleTweet == True:
+                client.create_tweet(text=resultweet)
+            else:
+                pass
         except:
-            api.update_status('There are rare items in the #Fortnite Item Shop tonight..\n\nHowever I am not able to post it as the tweet is too long. This means there are lots of rare cosmetics in the shop!')
-
+            if ToggleTweet == True:
+                client.create_tweet(text='There are rare items in the #Fortnite Item Shop tonight..\n\nHowever I am not able to post it as the tweet is too long. This means there are lots of rare cosmetics in the shop!')
+            else:
+                pass
+            
         for i in os.listdir('cache'):
             print(i)
 
