@@ -14,7 +14,6 @@ currentdate = currentdate[:10]
 # This merger is under rights, you may not take this code and use it in your own project without proper credits to Fevers and Dark.
 
 def merger(ogitems, datas: Union[list, None] = None, save_as: str = f'shop {currentdate}.jpg'):
-    print(ogitems)
     response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
     currentdate = response.json()['data']['date']
     currentdate = currentdate[:10]
