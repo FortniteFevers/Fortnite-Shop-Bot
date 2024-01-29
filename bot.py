@@ -1,25 +1,3 @@
-#===============#
-loadFont = 'BurbankBigRegular-BlackItalic.otf'
-showItems = False
-botDelay = 15
-
-ToggleTweet = True # True means the program uses your Twitter API keys. False means it does not.
-twitAPIKey = ""
-twitAPISecretKey = ""
-twitAccessToken = ""
-twitAccessTokenSecret = ""
-
-# CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
-updateMode = True # False means it instantly tweets it, true means it keeps refreshing until shop updates
-
-showData = True
-
-CreatorCode = 'Fevers'
-
-OGitemsbot = True
-opitemdate = 100
-#===============#
-
 import requests
 from PIL import Image, ImageFont, ImageDraw
 from datetime import date
@@ -28,6 +6,28 @@ import os
 import time
 import shutil
 import tweepy
+
+#===============#
+loadFont = 'BurbankBigRegular-BlackItalic.otf'
+showItems = False
+botDelay = 15
+
+ToggleTweet = False # True means the program uses your Twitter API keys. False means it does not.
+twitAPIKey = ""
+twitAPISecretKey = ""
+twitAccessToken = ""
+twitAccessTokenSecret = ""
+
+# CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
+updateMode = False # False means it instantly tweets it, true means it keeps refreshing until shop updates
+
+showData = True
+
+CreatorCode = 'Fevers'
+
+OGitemsbot = True
+opitemdate = 100
+#===============#
 
 if ToggleTweet == True:
     # V1 Tweepy
@@ -339,7 +339,7 @@ def genshop():
 
     print('\nMerging images...')
     from merger import merger
-    merger(currentdate)
+    merger(ogitems=False)
 
     end = time.time()
 
@@ -420,12 +420,10 @@ def genshop():
         print('Tweeted!')
 
     list.clear()
+    ogitems()
     time.sleep(10)
     
 def ogitems():
-    ######################
-    #opitemdate = 150
-    ######################
 
     today = date.today()
     currentdate = today.strftime("%Y-%m-%d")
@@ -526,9 +524,14 @@ def ogitems():
                 client.create_tweet(text='There are rare items in the #Fortnite Item Shop tonight..\n\nHowever I am not able to post it as the tweet is too long. This means there are lots of rare cosmetics in the shop!')
             else:
                 pass
-            
-        for i in os.listdir('cache'):
-            print(i)
+        
+        for filename in os.listdir('cache'):
+            for item in resultlist:
+                if f"{item['id']}.png" == filename:
+                    shutil.copy(f"cache/{filename}", f"ogcache/OG{filename}.png")
+        from merger import merger
+        merger(ogitems=True)
+
 
 def main():
     apiurl = f'https://fortnite-api.com/v2/shop/br/combined'
