@@ -12,6 +12,12 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 
 * *If you want to run the file once without tweeting, turn "updateMode" to "False". and turn "TweetShop" to "False".*
 
+# Keep in note:
+*  In the User authentication settings of your application on the Developer Portal, make sure to edit your settings to what I have below:
+*  Change your App permissions from *"Read"* to **"Read and write and Direct message"** (keep Request email from users off)
+*  Change Type of App from *"Native App"* to **"Web App, Automated App or Bot"**
+*  Under App info, change your "Callback URI / Redirect URL" to "https://localhost"
+*  Under App info, change your "Website URL" to "https://localhost.com"
 --------------
 
 # Modules:
