@@ -58,9 +58,12 @@ def genshop():
 
     try:
         shutil.rmtree('cache')
+        shutil.rmtree('ogcache')
         os.makedirs('cache')
+        shutil.rmtree('ogcache')
     except:
         os.makedirs('cache')
+        os.makedirs('ogcache')
 
     start = time.time()
 
