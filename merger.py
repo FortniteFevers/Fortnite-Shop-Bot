@@ -3,7 +3,6 @@ from PIL import Image, ImageFont, ImageDraw
 import PIL
 from datetime import datetime
 import os
-from colorama import *
 from math import ceil, sqrt
 from typing import Union
 import glob
