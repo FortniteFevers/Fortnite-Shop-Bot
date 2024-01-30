@@ -563,11 +563,6 @@ def main():
             
             if shopData != shopDataLoop: # Now run program as normal. Shop has changed.
 
-                s = response.json()['data']
-                featureditems = len(s['featured']['entries'])
-                dailyitems = len(s['daily']['entries'])
-                totalitems = featureditems+dailyitems
-
                 print('\nTHE SHOP HAS UPDATED!')
                 time.sleep(10)
                 try:
