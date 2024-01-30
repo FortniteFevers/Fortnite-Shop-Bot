@@ -25,6 +25,9 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 * *(Only works when the program is in updateMode)*
 * Toggle **OGitemsbot** to True
 * The "OG/Rare" item threshold is set by **opitemdate**. Change the value to set your threshold for cosmetics.
+
+# Misc ifo
+* If you'd like to customize the Tweet text, head over to lines 401 and 403 and edit it to your liking.
 --------------
 
 # Modules:
