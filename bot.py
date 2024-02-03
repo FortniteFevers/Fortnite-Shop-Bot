@@ -9,7 +9,7 @@ import tweepy
 
 #===============#
 loadFont = 'BurbankBigRegular-BlackItalic.otf'
-showItems = True
+showItems = True # Lets you know every time the program generates a cosmetic (used for debugging)
 botDelay = 5
 
 ToggleTweet = False # True means the program uses your Twitter API keys. False means it does not.
@@ -21,7 +21,7 @@ twitAccessTokenSecret = ''
 # CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
 updateMode = False # False means it instantly tweets it, True means it keeps refreshing until shop updates
 
-showData = False # Let's you know every time the program generates a cosmetic (used for debugging)
+showData = False # Only used when ToggleTweet is "True", posts a tweet with extra shop information
 
 CreatorCode = 'Fevers'
 
