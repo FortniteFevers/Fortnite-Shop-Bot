@@ -9,24 +9,26 @@ import tweepy
 
 #===============#
 loadFont = 'BurbankBigRegular-BlackItalic.otf'
-showItems = False
-botDelay = 15
+showItems = True
+botDelay = 5
 
-ToggleTweet = True # True means the program uses your Twitter API keys. False means it does not.
+ToggleTweet = False # True means the program uses your Twitter API keys. False means it does not.
 twitAPIKey = ''
 twitAPISecretKey = ''
 twitAccessToken = ''
 twitAccessTokenSecret = '' 
 
 # CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
-updateMode = False # False means it instantly tweets it, true means it keeps refreshing until shop updates
+updateMode = False # False means it instantly tweets it, True means it keeps refreshing until shop updates
 
-showData = True
+showData = False # Let's you know every time the program generates a cosmetic (used for debugging)
 
 CreatorCode = 'Fevers'
 
 OGitemsbot = True
-opitemdate = 180
+opitemdate = 180 # Threshold for classifying "Rare" items
+
+archiveShop = True # If True, the program saves a copy of the Item Shop with the corresponding date
 #===============#
 
 if ToggleTweet == True:
@@ -87,14 +89,17 @@ def genshop():
         for i in featured['entries']:
 
             if i['newDisplayAssetPath'] != None:
-                try:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
-                except:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
+                if i['newDisplayAsset'] != None:
+                    try:
+                        url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                    except:
+                        url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
             else:
                 url = i['items'][0]['images']['icon']
 
             name = i['items'][0]['id']
+            if showItems != False:
+                print("Loading... ", name)
             last_seen = i['items'][0]['shopHistory']
             try:
                 last_seen = last_seen[-2][:10]
@@ -214,15 +219,18 @@ def genshop():
         for i in daily['entries']:
 
             if i['newDisplayAssetPath'] != None:
-                try:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
-                except:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
+                if i['newDisplayAsset'] != None:
+                    try:
+                        url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                    except:
+                        url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
             else:
                 url = i['items'][0]['images']['icon']
 
 
             name = i['items'][0]['id']
+            if showItems != False:
+                print("Loading... ", name)
             last_seen = i['items'][0]['shopHistory']
             try:
                 last_seen = last_seen[-2][:10]
@@ -423,7 +431,10 @@ def genshop():
 
     list.clear()
     if OGitemsbot is True:
-        ogitems(tweetID=shoptweet.data['id'])
+        if ToggleTweet is True:
+            ogitems(tweetID=shoptweet.data['id'])
+        else:
+            ogitems(tweetID=None)
     time.sleep(10)
     
 def ogitems(tweetID):
@@ -528,6 +539,7 @@ def ogitems(tweetID):
                     shutil.copy(f"cache/{filename}", f"ogcache/OG{filename}.png")
         from merger import merger
         merger(ogitems=True)
+        print("Saved OG Items in 'ogcache'.\n")
 
         #   media_id = api.media_upload(filename="shop.jpg").media_id
         #   shoptweet = client.create_tweet(text=text, media_ids=[media_id])
