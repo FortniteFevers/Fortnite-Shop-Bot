@@ -6,6 +6,7 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 --------------
 
 # How to run:
+**[(WATCH A TUTORIAL ON HOW TO USE THIS BOT HERE!)](https://youtu.be/rf3ubhy1evA)** 
 1) Make sure you have [Python](https://www.python.org/downloads/) installed on your computer.
 2) Install all the required modules used in this program, scroll below for the list.
 3) Sign up for the [Twitter/X API program](https://developer.twitter.com/en/docs/platform-overview), and fill in your API keys within the "#=====#" comments in bot.py
