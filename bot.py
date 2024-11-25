@@ -9,27 +9,30 @@ import tweepy
 
 #===============#
 loadFont = 'BurbankBigRegular-BlackItalic.otf'
-showItems = False
-botDelay = 15
+showItems = True # # Lets you know every time the program generates a cosmetic (used for debugging)
+botDelay = 5
 
 ToggleTweet = False # True means the program uses your Twitter API keys. False means it does not.
-twitAPIKey = ""
-twitAPISecretKey = ""
-twitAccessToken = ""
-twitAccessTokenSecret = ""
+twitAPIKey = 'KN1mcBym6HFvdrXZJNwRlZXvU'
+twitAPISecretKey = '3LxR7V2HCVbNSWG2M67ael1oG0JXKLKpDrh0p7KgJH1cxujvhc'
+twitAccessToken = '1436864844091772929-2xxhWy4VI0JOdRNEIHpkboZytQANYO'
+twitAccessTokenSecret = 'ucNzi2jwf0B3AtZ9ot3WDKl4C389od9DlvZR6nZUXlsVQ' 
 
 # CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
-updateMode = False # False means it instantly tweets it, true means it keeps refreshing until shop updates
+updateMode = False # False means it instantly tweets it, True means it keeps refreshing until shop updates
 
-showData = True
+showData = False # Only used when ToggleTweet is "True", posts a tweet with extra shop information
 
 CreatorCode = 'Fevers'
 
 OGitemsbot = True
-opitemdate = 100
+opitemdate = 180 # Threshold for classifying "Rare" items
+
+archiveShop = True # If True, the program saves a copy of the Item Shop with the corresponding date
 #===============#
 
 if ToggleTweet == True:
+    print("\n! ! ! TWEETING IS ON ! ! !\n")
     # V1 Tweepy
     auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
     auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
@@ -56,20 +59,17 @@ def compress():
 
 def genshop():
 
-    try:
-        shutil.rmtree('cache')
-        shutil.rmtree('ogcache')
-        os.makedirs('cache')
-        shutil.rmtree('ogcache')
-    except:
-        os.makedirs('cache')
-        os.makedirs('ogcache')
+    print("Generating the Fortnite Item Shop.")
+
+    shutil.rmtree('cache', ignore_errors=True)
+    os.makedirs('cache', exist_ok=True)
 
     start = time.time()
 
-    response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
+    print('\nFetching shop data...')
+    response = requests.get('https://fortnite-api.com/v2/shop?responseFlags=0x7')
     if response:
-        pass
+        print('Data acquired! Generating image- this may take a moment.\n')
     else:
         return genshop()
 
@@ -78,271 +78,201 @@ def genshop():
     except:
         return genshop()
 
-    currentdate = response.json()['data']['date']
+    currentdate = data['date']
     currentdate = currentdate[:10]
 
     # --- FEATURED GEN --- #
-    print('\nGenerating Featured Section...')
-    featured = data['featured']
+    entries = data['entries']
     count = 0
-    if featured != None:
-        for i in featured['entries']:
-
-            if i['newDisplayAssetPath'] != None:
+ 
+    for i in entries:
+        
+        try:
+            if i['brItems']:
+                bgurl = False
                 try:
+                    bgurl = i['brItems'][0]['series']['image']
+                except:
+                    pass
+
+                try:
+                    url = i['newDisplayAsset']['renderImages'][0]['image']
+                except:
+                    try:
+                        url = i['brItems'][0]['images']['featured']
+                    except:
+                        url = i['brItems'][0]['images']['icon']
+
+                try:
+                    # This is the image form we want. It should be last so it can override the url.
                     url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
                 except:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
-            else:
-                url = i['items'][0]['images']['icon']
-
-            name = i['items'][0]['id']
-            last_seen = i['items'][0]['shopHistory']
-            try:
-                last_seen = last_seen[-2][:10]
-            except:
-                last_seen = 'NEW!'
-            price = i['finalPrice']
-
-            if i['bundle'] != None:
-                url = i['bundle']['image']
-                name = f"zzz{i['bundle']['name']}"
+                    pass
             
-            if last_seen != 'NEW!':
-                dateloop = datetime.strptime(last_seen, "%Y-%m-%d")
-                current = datetime.strptime(currentdate, "%Y-%m-%d")
-                diff = str(current.date() - dateloop.date())
-                diff = diff.replace('days, 0:00:00', '')
-                if diff == '0:00:00':
-                    diff = '1'
-            else:
-                diff = 'NEW!'
+
+                if bgurl != False:
+                    open(f'cache/backgroundtemp.png', 'wb').write(requests.get(bgurl).content)
+                    background = Image.open(f'cache/backgroundtemp.png').resize((512, 512)).convert("RGBA")
+
+                name = i['brItems'][0]['id']
+                last_seen = i['brItems'][0]['shopHistory']
+                try:
+                    last_seen = last_seen[-2][:10]
+                except:
+                    last_seen = 'NEW!'
+                price = i['finalPrice']
+
+                try: # Since fortnite removed bundles on some items for some reason
+                    if i['bundle'] != None:
+                        url = i['bundle']['image']
+                        filename = f"zzz{i['bundle']['name']}"
+                        name = i['bundle']['name']
+                except:
+                    filename = i['brItems'][0]['id'] # why not
+                    pass
+                
+                #if showItems != False:
+                #    print("Loading... ")
+                
+                if last_seen != 'NEW!':
+                    dateloop = datetime.strptime(last_seen, "%Y-%m-%d")
+                    current = datetime.strptime(currentdate, "%Y-%m-%d")
+                    diff = str(current.date() - dateloop.date())
+                    #print("Diff 1:", diff)
+                    diff = diff.replace('days, 0:00:00', '')
+                    if diff == '0:00:00':
+                        diff = '1'
+                else:
+                    diff = 'NEW!'
+                #print("Diff2:",diff)
 
 
-            open(f'cache/{name}.png', 'wb').write(requests.get(url).content)
-            background = Image.open(f'cache/{name}.png').resize((512, 512))
-            background.save(f'cache/{name}.png')
+                open(f'cache/{filename}.png', 'wb').write(requests.get(url).content)
+                background = Image.open(f'cache/{filename}.png').resize((512, 512)).convert("RGBA")
+                #background.save(f'cache/{filename}.png')
 
-            img=Image.new("RGB",(512,512))
-            img.paste(background)
+                img=Image.new("RGB",(512,512))
+                
+                if i['newDisplayAsset']['materialInstances'] == []:
+                    rarity = i["brItems"][0]['rarity']['value']
+                    rarity = rarity.lower()
+                    try:
+                        raritybackground = Image.open(f'rarities/{rarity}.png').convert("RGBA")
+                    except:
+                        raritybackground = Image.open(f'rarities/common.png').resize((1083, 1083), Image.ANTIALIAS).convert("RGBA")
 
-            # OTHER ITEMS GEN
-            try:
-                if i['bundle'] == None:
-                    if i['items'][1]:
-                        url = i['items'][1]['images']['icon']
-                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                        background = Image.open(f'cache/temp{name}.png').resize((80, 80))
-                        background.save(f'cache/temp{name}.png')
-                    
-                        background = Image.open(f'cache/temp{name}.png')
-                        img.paste(background, (0, 0), background)
+                    img.paste(raritybackground)
+                img.paste(background)
 
-                        os.remove(f'cache/temp{name}.png')
-                    if i['items'][2]:
-                        url = i['items'][2]['images']['icon']
-                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                        background = Image.open(f'cache/temp{name}.png').resize((80, 80))
-                        background.save(f'cache/temp{name}.png')
-                    
-                        background = Image.open(f'cache/temp{name}.png')
-                        img.paste(background, (0, 100), background)
+                # OTHER ITEMS GEN
+                try:
+                    if i['bundle'] == None:
+                        if i['brItems'][1]:
+                            url = i['brItems'][1]['images']['icon']
+                            open(f'cache/temp{filename}.png', 'wb').write(requests.get(url).content)
+                            background = Image.open(f'cache/temp{filename}.png').resize((80, 80))
+                            background.save(f'cache/temp{filename}.png')
+                        
+                            background = Image.open(f'cache/temp{filename}.png')
+                            img.paste(background, (0, 0), background)
 
-                        os.remove(f'cache/temp{name}.png')
+                            os.remove(f'cache/temp{filename}.png')
+                        if i['brItems'][2]:
+                            url = i['brItems'][2]['images']['icon']
+                            open(f'cache/temp{filename}.png', 'wb').write(requests.get(url).content)
+                            background = Image.open(f'cache/temp{filename}.png').resize((80, 80))
+                            background.save(f'cache/temp{filename}.png')
+                        
+                            background = Image.open(f'cache/temp{filename}.png')
+                            img.paste(background, (0, 100), background)
 
-                    if i['items'][3]:
-                        url = i['items'][3]['images']['icon']
-                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                        background = Image.open(f'cache/temp{name}.png').resize((80, 80))
-                        background.save(f'cache/temp{name}.png')
-                    
-                        background = Image.open(f'cache/temp{name}.png')
-                        img.paste(background, (0, 200), background)
+                            os.remove(f'cache/temp{filename}.png')
 
-                        os.remove(f'cache/temp{name}.png')
-            except:
-                pass
+                        if i['brItems'][3]:
+                            url = i['brItems'][3]['images']['icon']
+                            open(f'cache/temp{filename}.png', 'wb').write(requests.get(url).content)
+                            background = Image.open(f'cache/temp{filename}.png').resize((80, 80))
+                            background.save(f'cache/temp{filename}.png')
+                        
+                            background = Image.open(f'cache/temp{filename}.png')
+                            img.paste(background, (0, 200), background)
+
+                            os.remove(f'cache/temp{filename}.png')
+                except:
+                    pass
 
 
 
-            overlay = Image.open('overlay.png').convert('RGBA')
-            img.paste(overlay, (0,0), overlay)
+                overlay = Image.open('overlay.png').convert('RGBA')
+                img.paste(overlay, (0,0), overlay)
 
-            img.save(f'cache/{name}.png')
+                img.save(f'cache/{filename}.png')
 
-            background = Image.open(f'cache/{name}.png')
+                background = Image.open(f'cache/{filename}.png')
 
-            itemname = i['items'][0]['name']
-            if i['bundle'] != None:
-                itemname = f"{i['bundle']['name']}"
+                itemname = i['brItems'][0]['name']
+
+                try: # Since fortnite removed bundles on some items for some reason again
+                    if i['bundle'] != None:
+                        itemname = i['bundle']['name']
+                except:
+                    itemname = i['brItems'][0]['name']
+                    pass
+
+                if showItems != False:
+                    print("Loading... ", itemname)
+
+                try: # Once again since fortnite is dumb
+                    if i['bundle'] != None:
+                        itemname = f"{i['bundle']['name']}"
+                except:
+                    pass
+                
+                font=ImageFont.truetype(loadFont,35)
+                draw=ImageDraw.Draw(background)
+                draw.text((256,420),itemname,font=font,fill='white', anchor='ms') # Writes name
+
+                if 'NEW!' in diff:
+                    diff_text = 'NEW!'
+                else:
+                    #diff = diff.replace(' ', '') ??????? WHY DID I INCLUDE THIS HELLO??????
+                    diff_text = f'LAST SEEN: {diff} days ago'
+
+                if '0:00' in diff_text:
+                    diff_text = 'LAST SEEN: 1 day ago'
+
+                font=ImageFont.truetype(loadFont,15)
+                draw=ImageDraw.Draw(background)
+                draw.text((256,450),diff_text,font=font,fill='white', anchor='ms') # Writes date last seen
+
+                font=ImageFont.truetype(loadFont,40)
+                draw=ImageDraw.Draw(background)
+                draw.text((256,505),f'{price}',font=font,fill='white', anchor='ms') # Writes price
+
+                background.save(f'cache/{filename}.png')
+
+                if showItems != False:
+                    print(f'{diff_text}\n{name} - {price}\n')
+                    # Example: Last seen: 1 day ago then the name, price, etc. you get the rest.
+
+                count += 1
+        except KeyError:
+             # Handle the case where 'brItems' does not exist
+            pass  # Or handle the exception as needed without breaking the loop
             
-            font=ImageFont.truetype(loadFont,35)
-            draw=ImageDraw.Draw(background)
-            draw.text((256,420),itemname,font=font,fill='white', anchor='ms') # Writes name
-
-            if 'NEW!' in diff:
-                diff_text = 'NEW!'
-            else:
-                diff = diff.replace(' ', '')
-                diff_text = f'LAST SEEN: {diff} days ago'
-
-            if '0:00' in diff_text:
-                diff_text = 'LAST SEEN: 1 day ago'
-
-            font=ImageFont.truetype(loadFont,15)
-            draw=ImageDraw.Draw(background)
-            draw.text((256,450),diff_text,font=font,fill='white', anchor='ms') # Writes date last seen
-
-            font=ImageFont.truetype(loadFont,40)
-            draw=ImageDraw.Draw(background)
-            draw.text((256,505),f'{price}',font=font,fill='white', anchor='ms') # Writes price
-
-            background.save(f'cache/{name}.png')
-
-            if showItems != False:
-                print(f'Last Seen: {diff} days ago\n{name} - {price}\n')
-
-            count += 1
 
     print(f'Done generating "{count}" items in the Featured section.')
     featrued_num = count
     print('')
-
-    # --- DAILY GEN --- #
-    print('Generating Daily Section...')
-    daily = data['daily']
-    count = 0
-    if daily != None:
-        for i in daily['entries']:
-
-            if i['newDisplayAssetPath'] != None:
-                try:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
-                except:
-                    url = i['newDisplayAsset']['materialInstances'][0]['images']['OfferImage']
-            else:
-                url = i['items'][0]['images']['icon']
-
-
-            name = i['items'][0]['id']
-            last_seen = i['items'][0]['shopHistory']
-            try:
-                last_seen = last_seen[-2][:10]
-            except:
-                last_seen = 'NEW!'
-            price = i['finalPrice']
-
-            if i['bundle'] != None:
-                url = i['bundle']['image']
-                name = f"zzz{i['bundle']['name']}"
-            
-            if last_seen != 'NEW!':
-                dateloop = datetime.strptime(last_seen, "%Y-%m-%d")
-                current = datetime.strptime(currentdate, "%Y-%m-%d")
-                diff = str(current.date() - dateloop.date())
-                diff = diff.replace('days, 0:00:00', '')
-                if diff == '0:00:00':
-                    diff = '1'
-            else:
-                diff = 'NEW!'
-
-
-            open(f'cache/{name}.png', 'wb').write(requests.get(url).content)
-            background = Image.open(f'cache/{name}.png').resize((512, 512))
-            background.save(f'cache/{name}.png')
-
-            img=Image.new("RGB",(512,512))
-            img.paste(background)
-
-            # OTHER ITEMS GEN
-            try:
-                if i['bundle'] == None:
-                    if i['items'][1]:
-                        url = i['items'][1]['images']['icon']
-                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                        background = Image.open(f'cache/temp{name}.png').resize((80, 80))
-                        background.save(f'cache/temp{name}.png')
-                    
-                        background = Image.open(f'cache/temp{name}.png')
-                        img.paste(background, (0, 0), background)
-
-                        os.remove(f'cache/temp{name}.png')
-                    if i['items'][2]:
-                        url = i['items'][2]['images']['icon']
-                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                        background = Image.open(f'cache/temp{name}.png').resize((80, 80))
-                        background.save(f'cache/temp{name}.png')
-                    
-                        background = Image.open(f'cache/temp{name}.png')
-                        img.paste(background, (0, 100), background)
-
-                        os.remove(f'cache/temp{name}.png')
-
-                    if i['items'][3]:
-                        url = i['items'][3]['images']['icon']
-                        open(f'cache/temp{name}.png', 'wb').write(requests.get(url).content)
-                        background = Image.open(f'cache/temp{name}.png').resize((80, 80))
-                        background.save(f'cache/temp{name}.png')
-                    
-                        background = Image.open(f'cache/temp{name}.png')
-                        img.paste(background, (0, 200), background)
-
-                        os.remove(f'cache/temp{name}.png')
-            except:
-                pass
-
-            overlay = Image.open('overlay.png').convert('RGBA')
-            img.paste(overlay, (0,0), overlay)
-
-            img.save(f'cache/{name}.png')
-
-            background = Image.open(f'cache/{name}.png')
-
-
-            itemname = i['items'][0]['name']
-            if i['bundle'] != None:
-                itemname = f"{i['bundle']['name']}"
-            font=ImageFont.truetype(loadFont,35)
-            draw=ImageDraw.Draw(background)
-            draw.text((256,420),itemname,font=font,fill='white', anchor='ms') # Writes name
-
-            if 'NEW!' in diff:
-                diff_text = 'NEW!'
-            else:
-                diff = diff.replace(' ', '')
-                diff_text = f'LAST SEEN: {diff} days ago'
-
-            if '0:00' in diff_text:
-                diff_text = 'LAST SEEN: 1 day ago'
-
-            font=ImageFont.truetype(loadFont,15)
-            draw=ImageDraw.Draw(background)
-            draw.text((256,450),diff_text,font=font,fill='white', anchor='ms') # Writes date last seen
-
-            font=ImageFont.truetype(loadFont,40)
-            draw=ImageDraw.Draw(background)
-            draw.text((256,505),f'{price}',font=font,fill='white', anchor='ms') # Writes price
-
-            background.save(f'cache/{name}.png')
-
-            if showItems != False:
-                print(f'Last Seen: {diff} days ago\n{name} - {price}\n')
-
-            count += 1
-    else:
-        print("Daily section does not exist.")
-
-    print(f'Done generating "{count}" items in the Daily section.')
-    daily_num = count
     
     #########################
 
-    totalnum = daily_num + featrued_num
+    totalnum = featrued_num
     print(f'\nGenerated {totalnum} items from the {currentdate} Item Shop.')
 
     print('\nMerging images...')
     from merger import merger
-    merger(ogitems=False)
+    merger(ogitems=False, currentdate=currentdate)
 
     end = time.time()
 
@@ -370,20 +300,6 @@ def genshop():
                 daysd=int(diff.days)
                 list.append(daysd)
     
-    if s['daily'] != None:
-        for i in s['daily']['entries']:
-            for i in i['items']:
-                shophistory = i['shopHistory']
-                try:
-                    lastseen = shophistory[-2]
-                except:
-                    lastseen = currentdate
-                lastseen = lastseen[:10]
-                dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-                current = datetime.strptime(currentdate, "%Y-%m-%d")
-                diff = current.date() - dateloop.date()
-                daysd=int(diff.days)
-                list.append(daysd)
     if list != []:
         list.sort(reverse = True)
         maxitem = list[0]
@@ -409,30 +325,39 @@ def genshop():
         try:
             try:
                 media_id = api.media_upload(filename="shop.jpg").media_id
-                client.create_tweet(text=text, media_ids=[media_id])
+                shoptweet = client.create_tweet(text=text, media_ids=[media_id])
             except Exception as e:
                 print(e)
         except:
             compress()
             try:
                 media_id = api.media_upload(filename="shop.jpg").media_id
-                client.create_tweet(text=text, media_ids=[media_id])
+                shoptweet = client.create_tweet(text=text, media_ids=[media_id])
             except Exception as e:
                 print(e)
 
         print('Tweeted!')
+        print(f"Tweet ID: {shoptweet.data['id']}")
 
     list.clear()
-    ogitems()
+    if OGitemsbot is True:
+        print("Running OG Items bot")
+        if ToggleTweet is True:
+            ogitems(tweetID=shoptweet.data['id'])
+        else:
+            ogitems(tweetID=None)
     time.sleep(10)
     
-def ogitems():
-
+def ogitems(tweetID):
+    try:
+        shutil.rmtree('ogcache')
+        os.makedirs('ogcache')
+    except:
+        os.makedirs('ogcache')
     today = date.today()
     currentdate = today.strftime("%Y-%m-%d")
     response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
     featured = response.json()['data']['featured']
-    daily = response.json()['data']['daily']
 
     resultlist = []
     numberlist = []
@@ -465,43 +390,16 @@ def ogitems():
                 )
 
                 numberlist.append(diff.days)
-    if daily != None:
-        for i in daily['entries']:
-            for i in i['items']:
-                id = i['id']
-                name = i['name']
-                type = i['type']['displayValue']
-                shophistory = i['shopHistory']
-                try:
-                    lastseen = shophistory[-2]
-                except:
-                    lastseen = currentdate
-                lastseen = lastseen[:10]
-                dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-                current = datetime.strptime(currentdate, "%Y-%m-%d")
-                diff = current.date() - dateloop.date()
-                daysd=int(diff.days)
-                if daysd >= opitemdate:
-                
-                    resultlist.append(
-                        {
-                            "name": name,
-                            "id": id,
-                            "lastseen_days": f"{diff.days}",
-                            "lastseen_date": lastseen,
-                            "type": type
-                        }
-                    )
 
-                    numberlist.append(diff.days)
-    print(numberlist)
+    #print(numberlist) ([364, 364, 145, 132, 159, 298, 161])
+    print('')
     if numberlist == []:
         print('There are no rare items tonight.')
         if ToggleTweet == True:
-            client.create_tweet(text=f"There are no rare items that have returned in the #Fortnite Item Shop of {currentdate}.")
+            client.create_tweet(text=f"There are no rare items (items that haven't been in the shop for {opitemdate} days) that have returned in the #Fortnite Item Shop of {currentdate}.", in_reply_to_tweet_id=tweetID)
         pass
     else:
-        print('There are rare items tonight!')
+        print('Rare cosmetics have been detected!')
         numberlist.sort()
         biggestnum = numberlist[-1]
 
@@ -517,23 +415,22 @@ def ogitems():
         resultweet = f"{tweetstring}\n\n{rarestitem}"
         print(resultweet)
 
-        try:
-            if ToggleTweet == True:
-                client.create_tweet(text=resultweet)
-            else:
-                pass
-        except:
-            if ToggleTweet == True:
-                client.create_tweet(text='There are rare items in the #Fortnite Item Shop tonight..\n\nHowever I am not able to post it as the tweet is too long. This means there are lots of rare cosmetics in the shop!')
-            else:
-                pass
-        
         for filename in os.listdir('cache'):
             for item in resultlist:
                 if f"{item['id']}.png" == filename:
                     shutil.copy(f"cache/{filename}", f"ogcache/OG{filename}.png")
         from merger import merger
         merger(ogitems=True)
+        print("Saved in this folder as 'OGitems'.\n")
+
+        #   media_id = api.media_upload(filename="shop.jpg").media_id
+        #   shoptweet = client.create_tweet(text=text, media_ids=[media_id])
+        if ToggleTweet == True:
+            media_id = api.media_upload(filename="OGitems.jpg").media_id
+            client.create_tweet(text=f"There are {len(numberlist)} cosmetics that haven't been seen in {opitemdate} days!\n\n#Fortnite", media_ids=[media_id], in_reply_to_tweet_id=tweetID)
+            print("Replied to original tweet with OG Item Bot.")
+        else:
+            pass
 
 
 def main():
@@ -560,11 +457,6 @@ def main():
             
             if shopData != shopDataLoop: # Now run program as normal. Shop has changed.
 
-                s = response.json()['data']
-                featureditems = len(s['featured']['entries'])
-                dailyitems = len(s['daily']['entries'])
-                totalitems = featureditems+dailyitems
-
                 print('\nTHE SHOP HAS UPDATED!')
                 time.sleep(10)
                 try:
@@ -573,9 +465,6 @@ def main():
                 except:
                     os.makedirs('cache')
                 genshop()
-
-                if OGitemsbot is True:
-                    ogitems()
 
                 time.sleep(5)
                 return main()
