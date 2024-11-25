@@ -4,7 +4,9 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 (If you do not want to use the Twitter / X capabilities of the program, change "ToggleTweet" to "False" & "UpdateMode" to "False" in bot.py)
 
 --------------
-
+> [!WARNING]  
+> This branch is in **beta** and will have issues while running.
+> 
 # How to run:
 1) Make sure you have [Python](https://www.python.org/downloads/) installed on your computer.
 2) Install all the required modules used in this program, scroll below for the list.
