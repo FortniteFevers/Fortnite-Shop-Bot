@@ -6,18 +6,13 @@ import os
 from math import ceil, sqrt
 from typing import Union
 import glob
-response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
 
-currentdate = response.json()['data']['date']
-currentdate = currentdate[:10]
 # Credits to https://github.com/MyNameIsDark01 for the original Merger code.
 # This merger is under rights, you may not take this code and use it in your own project without proper credits to Fevers and Dark.
 
-def merger(ogitems, datas: Union[list, None] = None, save_as: str = f'shop {currentdate}.jpg'):
-    print(ogitems)
-    response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
-    currentdate = response.json()['data']['date']
-    currentdate = currentdate[:10]
+def merger(ogitems, currentdate, datas: Union[list, None] = None):
+    save_as = f'shop {currentdate}.jpg'
+    
     if not datas:
         if ogitems == False:
             datas = [Image.open(i) for i in glob.glob('cache/*.png')]
