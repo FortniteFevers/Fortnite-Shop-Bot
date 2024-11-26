@@ -13,10 +13,10 @@ showItems = True # # Lets you know every time the program generates a cosmetic (
 botDelay = 5
 
 ToggleTweet = False # True means the program uses your Twitter API keys. False means it does not.
-twitAPIKey = 'KN1mcBym6HFvdrXZJNwRlZXvU'
-twitAPISecretKey = '3LxR7V2HCVbNSWG2M67ael1oG0JXKLKpDrh0p7KgJH1cxujvhc'
-twitAccessToken = '1436864844091772929-2xxhWy4VI0JOdRNEIHpkboZytQANYO'
-twitAccessTokenSecret = 'ucNzi2jwf0B3AtZ9ot3WDKl4C389od9DlvZR6nZUXlsVQ' 
+twitAPIKey = ''
+twitAPISecretKey = ''
+twitAccessToken = ''
+twitAccessTokenSecret = '' 
 
 # CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
 updateMode = False # False means it instantly tweets it, True means it keeps refreshing until shop updates
