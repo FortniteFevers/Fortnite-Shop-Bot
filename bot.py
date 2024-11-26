@@ -8,15 +8,16 @@ import shutil
 import tweepy
 
 #===============#
-loadFont = 'BurbankBigRegular-BlackItalic.otf'
-showItems = True # # Lets you know every time the program generates a cosmetic (used for debugging)
-botDelay = 5
+loadFont = 'BurbankBigRegular-BlackItalic.otf' # File locaton the bot uses
+showItems = False # # Lets you know every time the program generates a cosmetic (used for debugging)
+botDelay = 5 # Seconds the bot takes to update in updateMode
 
 ToggleTweet = False # True means the program uses your Twitter API keys. False means it does not.
-twitAPIKey = ''
-twitAPISecretKey = ''
-twitAccessToken = ''
-twitAccessTokenSecret = '' 
+
+twitAPIKey = ''                                # DO NOT SHOW THIS KEY TO ANYONE
+twitAPISecretKey = '' # DO NOT SHOW THIS KEY TO ANYONE
+twitAccessToken = ''  # DO NOT SHOW THIS KEY TO ANYONE
+twitAccessTokenSecret = '' # DO NOT SHOW THIS KEY TO ANYONE
 
 # CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
 updateMode = False # False means it instantly tweets it, True means it keeps refreshing until shop updates
@@ -33,11 +34,11 @@ archiveShop = True # If True, the program saves a copy of the Item Shop with the
 
 if ToggleTweet == True:
     print("\n! ! ! TWEETING IS ON ! ! !\n")
+
     # V1 Tweepy
     auth = tweepy.OAuthHandler(twitAPIKey, twitAPISecretKey)
     auth.set_access_token(twitAccessToken, twitAccessTokenSecret)
     api = tweepy.API(auth, wait_on_rate_limit=True)
-
 
     # V2 Tweepy
     client = tweepy.Client(
@@ -48,14 +49,22 @@ if ToggleTweet == True:
         wait_on_rate_limit=True
         )
 
-def compress():
-    import math
-    foo = Image.open("shop.jpg")
-    x, y = foo.size
-    x2, y2 = math.floor(x/2), math.floor(y/2)
-    foo = foo.resize((x2,y2))
-    foo.save("shop.jpg",quality=65)
-    print('Compressed image!')
+def compress_image(input_path, output_path, quality=50):
+    """
+    Compress a JPG image to the specified quality.
+    
+    :param input_path: Path to the input image.
+    :param output_path: Path to save the compressed image.
+    :param quality: Quality level for compression (1-100).
+    """
+    try:
+        # Open the image
+        with Image.open(input_path) as img:
+            # Save the image with the specified quality
+            img.save(output_path, "JPEG", quality=quality)
+            print(f"Image successfully compressed and saved to {output_path}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 def genshop():
 
@@ -91,7 +100,7 @@ def genshop():
             if i['brItems']:
                 bgurl = False
                 try:
-                    bgurl = i['brItems'][0]['series']['image']
+                    bgurl = i['brItems'][0]['series']['image'] # If it comes to a point where it doesnt have a background image, we can use this instead
                 except:
                     pass
 
@@ -166,7 +175,7 @@ def genshop():
 
                 # OTHER ITEMS GEN
                 try:
-                    if i['bundle'] == None:
+                    if i['bundle'] != None:
                         if i['brItems'][1]:
                             url = i['brItems'][1]['images']['icon']
                             open(f'cache/temp{filename}.png', 'wb').write(requests.get(url).content)
@@ -285,20 +294,24 @@ def genshop():
 
     list = []
 
-    if s['featured'] != None:
-        for i in s['featured']['entries']:
-            for i in i['items']:
-                shophistory = i['shopHistory']
-                try:
-                    lastseen = shophistory[-2]
-                except:
-                    lastseen = currentdate
-                lastseen = lastseen[:10]
-                dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-                current = datetime.strptime(currentdate, "%Y-%m-%d")
-                diff = current.date() - dateloop.date()
-                daysd=int(diff.days)
-                list.append(daysd)
+    if s['entries'] != None:
+        for i in s['entries']:
+            try:
+                if i['brItems']:
+                    for i in i['brItems']:
+                        shophistory = i['shopHistory']
+                        try:
+                            lastseen = shophistory[-2]
+                        except:
+                            lastseen = currentdate
+                        lastseen = lastseen[:10]
+                        dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
+                        current = datetime.strptime(currentdate, "%Y-%m-%d")
+                        diff = current.date() - dateloop.date()
+                        daysd=int(diff.days)
+                        list.append(daysd)
+            except KeyError:
+                pass
     
     if list != []:
         list.sort(reverse = True)
@@ -329,7 +342,7 @@ def genshop():
             except Exception as e:
                 print(e)
         except:
-            compress()
+            compress_image("shop.png", "shop.png", quality=30)
             try:
                 media_id = api.media_upload(filename="shop.jpg").media_id
                 shoptweet = client.create_tweet(text=text, media_ids=[media_id])
@@ -356,42 +369,45 @@ def ogitems(tweetID):
         os.makedirs('ogcache')
     today = date.today()
     currentdate = today.strftime("%Y-%m-%d")
-    response = requests.get('https://fortnite-api.com/v2/shop/br/combined')
-    featured = response.json()['data']['featured']
+    response = requests.get('https://fortnite-api.com/v2/shop?responseFlags=0x7')
+    entries = response.json()['data']['entries']
 
     resultlist = []
     numberlist = []
 
-    for i in featured['entries']:
-        for i in i['items']:
-            id = i['id']
-            name = i['name']
-            type = i['type']['displayValue']
-            shophistory = i['shopHistory']
-            try:
-                lastseen = shophistory[-2]
-            except:
-                lastseen = currentdate
-            lastseen = lastseen[:10]
-            dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
-            current = datetime.strptime(currentdate, "%Y-%m-%d")
-            diff = current.date() - dateloop.date()
-            daysd=int(diff.days)
-            if daysd >= opitemdate:
-            
-                resultlist.append(
-                    {
-                        "name": name,
-                        "id": id,
-                        "lastseen_days": f"{diff.days}",
-                        "lastseen_date": lastseen,
-                        "type": type
-                    }
-                )
+    for i in entries:
+        try:
+            if i['brItems']:
+                for i in i['items']:
+                    id = i['id']
+                    name = i['name']
+                    type = i['type']['displayValue']
+                    shophistory = i['shopHistory']
+                    try:
+                        lastseen = shophistory[-2]
+                    except:
+                        lastseen = currentdate
+                    lastseen = lastseen[:10]
+                    dateloop = datetime.strptime(lastseen, "%Y-%m-%d")
+                    current = datetime.strptime(currentdate, "%Y-%m-%d")
+                    diff = current.date() - dateloop.date()
+                    daysd=int(diff.days)
+                    if daysd >= opitemdate:
+                    
+                        resultlist.append(
+                            {
+                                "name": name,
+                                "id": id,
+                                "lastseen_days": f"{diff.days}",
+                                "lastseen_date": lastseen,
+                                "type": type
+                            }
+                        )
 
-                numberlist.append(diff.days)
+                        numberlist.append(diff.days)
+        except KeyError:
+            pass
 
-    #print(numberlist) ([364, 364, 145, 132, 159, 298, 161])
     print('')
     if numberlist == []:
         print('There are no rare items tonight.')
@@ -434,13 +450,12 @@ def ogitems(tweetID):
 
 
 def main():
-    apiurl = f'https://fortnite-api.com/v2/shop/br/combined'
+    apiurl = f'https://fortnite-api.com/v2/shop?responseFlags=0x7'
 
     response = requests.get(apiurl)
     shopData = response.json()['data']['hash']
     currentdate = response.json()['data']['date']
     currentdate = currentdate[:10]
-
 
     count = 1
 
