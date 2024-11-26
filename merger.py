@@ -12,7 +12,8 @@ import glob
 
 def merger(ogitems, currentdate, datas: Union[list, None] = None):
     save_as = f'shop {currentdate}.jpg'
-    
+
+    # If no data is passed, retrieve from cache folders
     if not datas:
         if ogitems == False:
             datas = [Image.open(i) for i in glob.glob('cache/*.png')]
@@ -20,69 +21,52 @@ def merger(ogitems, currentdate, datas: Union[list, None] = None):
             datas = [Image.open(i) for i in glob.glob('ogcache/*.png')]
 
     list_ = []
-    num = 0
     if ogitems == False:
-        for file in os.listdir('cache'):
-            num += 1
-            
-            if file.startswith('tempzzz'):
-                pass
-            else:
-                list_.append(f'cache/{file}')
+        list_.extend(f'cache/{file}' for file in os.listdir('cache') if not file.startswith('tempzzz'))
     else:
-        for file in os.listdir('ogcache'):
-            num += 1   
-            list_.append(f'ogcache/{file}')
+        list_.extend(f'ogcache/{file}' for file in os.listdir('ogcache'))
 
-    row_n = num
-        
-    rowslen = ceil(sqrt(row_n))
-    columnslen = round(sqrt(row_n))
+    # Number of items and grid size calculation
+    num = len(list_)
+    rowslen = ceil(sqrt(num))
+    columnslen = ceil(num / rowslen)  # Ensure enough rows for all items
 
     mode = "RGB"
     px = 512
 
-    rows = rowslen * px
-    columns = columnslen * px
-    image = Image.new(mode, (rows, columns))
+    # Final image size
+    width = rowslen * px
+    height = columnslen * px
+    image = Image.new(mode, (width, height), (0, 0, 0))  # Fill with black to avoid blank gaps
 
-    i = 0
-
+    # Sort files to ensure consistent order
     datas = [Image.open(i) for i in sorted(list_)]
 
-    for card in datas:
-        image.paste(
-            card,
-            ((0 + ((i % rowslen) * card.width)),
-                (0 + ((i // rowslen) * card.height)))
-        )
+    # Paste each image onto the grid
+    for i, card in enumerate(datas):
+        x = (i % rowslen) * px
+        y = (i // rowslen) * px
+        image.paste(card, (x, y))
 
-        i += 1
-
-    if ogitems == False:
-        image.save(f"{save_as}")
-    else:
-        image.save(f"OGitems.jpg")
+    # Save main shop image
+    image.save(f"{save_as}" if ogitems == False else "OGitems.jpg")
 
     #==== GENERATES TITLE ====#
 
     if ogitems == False:
-        img = PIL.Image.open(f"{save_as}")
-        width, height = img.size
-
-        img=Image.new("RGB",(width,height+322), 0x000000)
-
+        img = Image.new("RGB", (width, height + 322), 0x000000)  # Add space for the title
         shopimage = Image.open(f"{save_as}")
         img.paste(shopimage, (0, 322))
         
-        font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',150)
-        draw=ImageDraw.Draw(img)
-        draw.text((width/2,190),'FORTNITE ITEM SHOP',font=font,fill='white', anchor='ms') # Writes name
+        # Add title and date
+        font_title = ImageFont.truetype('BurbankBigRegular-BlackItalic.otf', 150)
+        font_date = ImageFont.truetype('BurbankBigRegular-BlackItalic.otf', 50)
+        draw = ImageDraw.Draw(img)
+        draw.text((width / 2, 190), 'FORTNITE ITEM SHOP', font=font_title, fill='white', anchor='ms')  # Title
+        draw.text((width / 2, 240), currentdate, font=font_date, fill='white', anchor='ms')  # Date
 
-        font=ImageFont.truetype('BurbankBigRegular-BlackItalic.otf',50)
-        draw.text((width/2,240),currentdate,font=font,fill='white', anchor='ms') # Writes name
-
+        # Save final image
         img.save(f'{save_as}')
         img.save('shop.jpg')
 
-        return image
+    return image
