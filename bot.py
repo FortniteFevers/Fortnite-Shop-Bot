@@ -121,7 +121,7 @@ def genshop():
 
                 if bgurl != False:
                     open(f'cache/backgroundtemp.png', 'wb').write(requests.get(bgurl).content)
-                    background = Image.open(f'cache/backgroundtemp.png').resize((512, 512)).convert("RGBA")
+                    tempbg = Image.open(f'cache/backgroundtemp.png').resize((512, 512)).convert("RGBA")
 
                 name = i['brItems'][0]['id']
                 last_seen = i['brItems'][0]['shopHistory']
@@ -158,6 +158,7 @@ def genshop():
 
                 open(f'cache/{filename}.png', 'wb').write(requests.get(url).content)
                 background = Image.open(f'cache/{filename}.png').resize((512, 512)).convert("RGBA")
+                    
                 #background.save(f'cache/{filename}.png')
 
                 img=Image.new("RGB",(512,512))
@@ -171,6 +172,9 @@ def genshop():
                         raritybackground = Image.open(f'rarities/common.png').resize((1083, 1083), Image.ANTIALIAS).convert("RGBA")
 
                     img.paste(raritybackground)
+
+                if bgurl != False:
+                    img.paste(tempbg)
                 img.paste(background)
 
                 # OTHER ITEMS GEN
@@ -280,6 +284,12 @@ def genshop():
     print(f'\nGenerated {totalnum} items from the {currentdate} Item Shop.')
 
     print('\nMerging images...')
+
+    try:
+        os.remove('cache/backgroundtemp.png')
+    except:
+        pass
+    
     from merger import merger
     merger(ogitems=False, currentdate=currentdate)
 
