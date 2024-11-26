@@ -31,7 +31,6 @@ opitemdate = 180 # Threshold for classifying "Rare" items
 
 archiveShop = True # If True, the program saves a copy of the Item Shop with the corresponding date
 #===============#
-
 if ToggleTweet == True:
     print("\n! ! ! TWEETING IS ON ! ! !\n")
 
@@ -99,6 +98,7 @@ def genshop():
         try:
             if i['brItems']:
                 bgurl = False
+                displayAsset = False
                 try:
                     bgurl = i['brItems'][0]['series']['image'] # If it comes to a point where it doesnt have a background image, we can use this instead
                 except:
@@ -115,6 +115,7 @@ def genshop():
                 try:
                     # This is the image form we want. It should be last so it can override the url.
                     url = i['newDisplayAsset']['materialInstances'][0]['images']['Background']
+                    displayAsset = True
                 except:
                     pass
             
@@ -161,21 +162,25 @@ def genshop():
                     
                 #background.save(f'cache/{filename}.png')
 
-                img=Image.new("RGB",(512,512))
+                img=Image.new("RGBA",(512,512))
                 
-                if i['newDisplayAsset']['materialInstances'] == []:
+                if i['newDisplayAsset']['materialInstances'] == [] or bgurl == False and displayAsset == False:
                     rarity = i["brItems"][0]['rarity']['value']
                     rarity = rarity.lower()
                     try:
                         raritybackground = Image.open(f'rarities/{rarity}.png').convert("RGBA")
                     except:
-                        raritybackground = Image.open(f'rarities/common.png').resize((1083, 1083), Image.ANTIALIAS).convert("RGBA")
+                        raritybackground = Image.open(f'rarities/common.png').resize((1083, 1083)).convert("RGBA")
 
-                    img.paste(raritybackground)
+                    # Use alpha compositing to blend images with transparency
+                    img = Image.alpha_composite(img, raritybackground)
+                    print("Pasted unknown background")
 
                 if bgurl != False:
-                    img.paste(tempbg)
-                img.paste(background)
+                    img = Image.alpha_composite(img, tempbg)  # Ensure transparency is preserved
+
+                img = Image.alpha_composite(img, background)  # Ensure final background is layered
+
 
                 # OTHER ITEMS GEN
                 try:
@@ -214,10 +219,13 @@ def genshop():
                 except:
                     pass
 
-
-
                 overlay = Image.open('overlay.png').convert('RGBA')
-                img.paste(overlay, (0,0), overlay)
+
+                # Ensure both images are the same size
+                overlay = overlay.resize(img.size)
+
+                # Blend the overlay onto the base image 
+                img = Image.alpha_composite(img, overlay)
 
                 img.save(f'cache/{filename}.png')
 
