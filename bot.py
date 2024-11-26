@@ -31,6 +31,8 @@ opitemdate = 180 # Threshold for classifying "Rare" items
 
 archiveShop = True # If True, the program saves a copy of the Item Shop with the corresponding date
 #===============#
+
+
 if ToggleTweet == True:
     print("\n! ! ! TWEETING IS ON ! ! !\n")
 
@@ -60,7 +62,7 @@ def compress_image(input_path, output_path, quality=50):
         # Open the image
         with Image.open(input_path) as img:
             # Save the image with the specified quality
-            img.save(output_path, "JPEG", quality=quality)
+            img.convert("RGB").save(f"{output_path}", format="JPEG", optimize=True, quality=quality)
             print(f"Image successfully compressed and saved to {output_path}")
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -170,9 +172,13 @@ def genshop():
                     try:
                         raritybackground = Image.open(f'rarities/{rarity}.png').convert("RGBA")
                     except:
-                        raritybackground = Image.open(f'rarities/common.png').resize((1083, 1083)).convert("RGBA")
+                        raritybackground = Image.open(f'rarities/common.png').convert("RGBA")
 
                     # Use alpha compositing to blend images with transparency
+                    # Resize to match img dimensions
+                    raritybackground = raritybackground.resize(img.size)
+
+                    # Blend the background with transparency
                     img = Image.alpha_composite(img, raritybackground)
                     print("Pasted unknown background")
 
