@@ -9,12 +9,12 @@ import tweepy
 
 #===============#
 loadFont = 'BurbankBigRegular-BlackItalic.otf' # File locaton the bot uses
-showItems = False # # Lets you know every time the program generates a cosmetic (used for debugging)
+showItems = False # Lets you know every time the program generates a cosmetic (used for debugging)
 botDelay = 5 # Seconds the bot takes to update in updateMode
 
 ToggleTweet = False # True means the program uses your Twitter API keys. False means it does not.
 
-twitAPIKey = ''                                # DO NOT SHOW THIS KEY TO ANYONE
+twitAPIKey = '' # DO NOT SHOW THIS KEY TO ANYONE
 twitAPISecretKey = '' # DO NOT SHOW THIS KEY TO ANYONE
 twitAccessToken = ''  # DO NOT SHOW THIS KEY TO ANYONE
 twitAccessTokenSecret = '' # DO NOT SHOW THIS KEY TO ANYONE
@@ -22,9 +22,9 @@ twitAccessTokenSecret = '' # DO NOT SHOW THIS KEY TO ANYONE
 # CHANGE UPDATE MODE TO FALSE IF "ToggleTweet" IS FALSE!!!
 updateMode = False # False means it instantly tweets it, True means it keeps refreshing until shop updates
 
-showData = False # Only used when ToggleTweet is "True", posts a tweet with extra shop information
+showData = True # Only used when ToggleTweet is "True", posts a tweet with extra shop information
 
-CreatorCode = 'Fevers'
+CreatorCode = 'Fevers' # Used for posting on Twitter :)
 
 OGitemsbot = True
 opitemdate = 180 # Threshold for classifying "Rare" items
