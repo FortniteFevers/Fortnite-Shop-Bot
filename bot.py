@@ -156,7 +156,7 @@ def genshop():
 
                     # Blend the background with transparency
                     img = Image.alpha_composite(img, raritybackground)
-                    print("Pasted unknown background")
+                    #print("Pasted unknown background") USED FOR DEBUGGING
 
                 if bgurl != False:
                     img = Image.alpha_composite(img, tempbg)  # Ensure transparency is preserved
