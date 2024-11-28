@@ -35,7 +35,7 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 
 Install dependencies with:
 ```bash
-pip install requests Pillow tweepy tqdm
+pip install requests Pillow tweepy tqdm standard-imghdr
 ```
 --------------
 
