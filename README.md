@@ -34,11 +34,11 @@ A bot to automatically post the Fortnite Item Shop to a Twitter / X. All assets 
 
 ## Requirements
 - Python 3.x
-- Required libraries: `requests`, `Pillow`, `tweepy`, `shutil`, `datetime`, `os`, `time`
+- Required libraries: `requests`, `Pillow`, `tweepy`, `shutil`, `datetime`, `os`, `time`, `tqdm`
 
 Install dependencies with:
 ```bash
-pip install requests Pillow tweepy
+pip install requests Pillow tweepy tqdm
 ```
 --------------
 
