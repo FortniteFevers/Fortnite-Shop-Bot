@@ -2,8 +2,10 @@
 # Created by Fevers
 
 loadFont = 'BurbankBigRegular-BlackItalic.otf'  # File location the bot uses
-showItems = False  # Lets you know every time the program generates a cosmetic (used for debugging)
+debugItems = False  # Lets you know every time the program generates a cosmetic (used for debugging)
 botDelay = 5  # Seconds the bot takes to update in updateMode
+
+sideItemLoader = False # Toggles generating side items in the shop! Works with bundles and singular items. (Note: This increases loading time significantly)
 
 ToggleTweet = False  # True means the program uses your Twitter API keys. False means it does not.
 
