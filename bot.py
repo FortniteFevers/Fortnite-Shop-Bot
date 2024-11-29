@@ -471,7 +471,7 @@ def ogitems(tweetID):
 
 
 def main():
-    apiurl = f'https://fortnite-api.com/v2/shop?responseFlags=0x7'
+    apiurl = f'https://fortnite-api.com/v2/shop'
 
     response = requests.get(apiurl)
     shopData = response.json()['data']['hash']
