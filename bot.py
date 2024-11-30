@@ -72,7 +72,11 @@ def genshop():
     entries = data['entries']
     count = 0
  
-    for i in tqdm(entries, desc="Processing Items", unit="item"):
+    # Wrap the entries iterable with tqdm conditionally
+    entries_iterable = tqdm(entries, desc="Processing Items", unit="item") if showProgressBar else entries
+
+    # Use the single loop
+    for i in entries_iterable:
         
         try:
             if i['brItems']:
@@ -254,10 +258,22 @@ def genshop():
                         itemname = f"{i['bundle']['name']}"
                 except:
                     pass
-                
-                font=ImageFont.truetype(loadFont,35)
-                draw=ImageDraw.Draw(background)
-                draw.text((256,420),itemname,font=font,fill='white', anchor='ms') # Writes name
+               
+                font_size = 35  # Starting font size
+                font = ImageFont.truetype(loadFont, font_size)
+                draw = ImageDraw.Draw(background)
+
+                # Measure the text width and dynamically adjust font size
+                max_width = 400  # Adjust max width to fit your layout
+
+                # Calculate text width using `textbbox`
+                while draw.textbbox((0, 0), itemname, font=font)[2] > max_width:
+                    font_size -= 1
+                    font = ImageFont.truetype(loadFont, font_size)
+
+                # Center the text horizontally and position it
+                draw.text((256, 420), itemname, font=font, fill='white', anchor='ms')  # Writes name
+
 
                 if 'NEW!' in diff:
                     diff_text = 'NEW!'
