@@ -6,6 +6,7 @@ debugItems = False  # Lets you know every time the program generates a cosmetic 
 botDelay = 5  # Seconds the bot takes to update in updateMode
 
 sideItemLoader = False # Toggles generating side items in the shop! Works with bundles and singular items. (Note: This increases loading time significantly)
+showProgressBar = True  # Set to False to disable the progress bar
 
 ToggleTweet = False  # True means the program uses your Twitter API keys. False means it does not.
 
