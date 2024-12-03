@@ -10,7 +10,7 @@ import glob
 # Credits to https://github.com/MyNameIsDark01 for the original Merger code.
 # This merger is under rights, you may not take this code and use it in your own project without proper credits to Fevers and Dark.
 
-def merger(ogitems, currentdate, datas: Union[list, None] = None):
+def merger(ogitems, currentdate, archiveShop, datas: Union[list, None] = None):
     save_as = f'shop {currentdate}.jpg'
 
     # If no data is passed, retrieve from cache folders
@@ -66,7 +66,8 @@ def merger(ogitems, currentdate, datas: Union[list, None] = None):
         draw.text((width / 2, 240), currentdate, font=font_date, fill='white', anchor='ms')  # Date
 
         # Save final image
-        img.save(f'{save_as}')
+        if archiveShop != False:
+            img.save(f'{save_as}')
         img.save('shop.jpg')
 
     return image
