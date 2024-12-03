@@ -318,7 +318,7 @@ def genshop():
         pass
     
     from merger import merger
-    merger(ogitems=False, currentdate=currentdate)
+    merger(ogitems=False, currentdate=currentdate, archiveShop=archiveShop)
 
     end = time.time()
 
@@ -472,7 +472,7 @@ def ogitems(tweetID):
                 if f"{item['id']}.png" == filename:
                     shutil.copy(f"cache/{filename}", f"ogcache/OG{filename}.png")
         from merger import merger
-        merger(ogitems=True, currentdate=currentdate)
+        merger(ogitems=True, currentdate=currentdate, archiveShop=archiveShop)
         
         print("Saved in this folder as 'OGitems'.\n")
 
