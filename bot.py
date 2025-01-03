@@ -368,7 +368,7 @@ def genshop():
     if showData == True:
         text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner\n\nTotal Items: {totalnum}\nMax Last Seen: {maxitem} days\nMin Last Seen: {minitem} days\nAverage of Last Seen items: {average} days'
     else:
-        text = f'#Fortnite Item Shop update for {currentdate}!\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner'
+        text = f'#Fortnite Item Shop update for {currentdate}!\n\nGet it here: https://www.fortnite.com/item-shop?creator-code={CreatorCode}\n\nConsider using code "{CreatorCode}" to support me! #EpicPartner'
     print("", text)
     
     if ToggleTweet == True:
