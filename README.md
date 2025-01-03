@@ -41,3 +41,16 @@ pip install requests Pillow tweepy tqdm standard-imghdr
 
 # Example Image:
 ![Item Shop](https://pbs.twimg.com/media/GE-gTvBXUAAJnuJ?format=jpg&name=4096x4096)
+
+--------------
+
+### Todo list for Fortnite-Shop-Bot
+
+- [ ] Decrease loading time
+- [ ] Have the bot run online asynchronously
+- [ ] Cosmetics leaving shop bot, posts daily at ~9AM EST
+- [ ] More customization features for the bot
+- [ ] Website that updates daily, includes statistics on the Fortnite Item Shop not able to be seen on Epic's shop website
+- [ ] JamTrack bot, tracks the current rotation, rotation leaving soon, and added JamTracks in the shop
+- [ ] Seperate func to generate all JamTracks in the Shop (should be fast loading)
+- [ ] Update the way the program generates backgrounds for skins, bundles, etc
