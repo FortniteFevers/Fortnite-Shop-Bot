@@ -27,29 +27,23 @@ if ToggleTweet == True:
         wait_on_rate_limit=True
         )
 
+# Redone image compressor code- if the file size becomes too big you can bring the quality # down
 def compress_image(input_path, output_path, quality=50):
-    """
-    Compress a JPG image to the specified quality.
-    
-    :param input_path: Path to the input image.
-    :param output_path: Path to save the compressed image.
-    :param quality: Quality level for compression (1-100).
-    """
     try:
-        # Open the image
         with Image.open(input_path) as img:
-            # Save the image with the specified quality
             img.convert("RGB").save(f"{output_path}", format="JPEG", optimize=True, quality=quality)
             print(f"Image successfully compressed and saved to {output_path}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def genshop():
-
-    print("Generating the Fortnite Item Shop.")
-
+def clear_cache():
     shutil.rmtree('cache', ignore_errors=True)
     os.makedirs('cache', exist_ok=True)
+
+def genshop():
+    print("Generating the Fortnite Item Shop.")
+    
+    clear_cache()
 
     start = time.time()
 
@@ -121,11 +115,11 @@ def genshop():
                         filename = f"zzz{i['bundle']['name']}"
                         name = i['bundle']['name']
                 except:
-                    filename = i['brItems'][0]['id'] # why not
+                    filename = i['brItems'][0]['id'] # why not, if you want to change it to something else go ahead
                     pass
                 
                 #if debugItems != False:
-                #    print("Loading... ")
+                #    print("Loading... ") commented because i dont need this anymore
                 
                 if last_seen != 'NEW!':
                     dateloop = datetime.strptime(last_seen, "%Y-%m-%d")
@@ -137,13 +131,13 @@ def genshop():
                         diff = '1'
                 else:
                     diff = 'NEW!'
-                #print("Diff2:",diff)
+                #print("Diff2:",diff) used for debugging
 
 
                 open(f'cache/{filename}.png', 'wb').write(requests.get(url).content)
                 background = Image.open(f'cache/{filename}.png').resize((512, 512)).convert("RGBA")
                     
-                #background.save(f'cache/{filename}.png')
+                #background.save(f'cache/{filename}.png') already done, dont need to do it anymore
 
                 img=Image.new("RGBA",(512,512))
                 
@@ -169,7 +163,7 @@ def genshop():
                 img = Image.alpha_composite(img, background)  # Ensure final background is layered
 
 
-                # OTHER ITEMS GEN
+                # OTHER ITEMS GEN (doesn't add much generation time)
                 if sideItemLoader != False:
                     if debugItems != False:
                         print("sideItemLoader is active..")
